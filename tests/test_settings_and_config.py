@@ -50,7 +50,9 @@ def test_env_example_urls_match_settings_defaults():
             key, value = line.split("=", 1)
             example[key.strip()] = value.strip()
     defaults = Settings(_env_file=None)
-    for field in ("cvm_base_url", "b3_cotahist_base_url", "brapi_base_url", "bcb_sgs_base_url"):
+    from engine.settings import EXTERNAL_URL_FIELDS
+
+    for field in EXTERNAL_URL_FIELDS:
         assert example[field.upper()] == getattr(defaults, field)
 
 

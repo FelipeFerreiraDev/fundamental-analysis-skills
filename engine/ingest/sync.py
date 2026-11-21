@@ -36,7 +36,7 @@ class SyncReport:
 
 
 @contextmanager
-def _run(conn: duckdb.DuckDBPyConnection, provider: str, dataset: str) -> Iterator[UUID]:
+def ingestion_run(conn: duckdb.DuckDBPyConnection, provider: str, dataset: str) -> Iterator[UUID]:
     run_id = start_run(conn, provider, dataset)
     try:
         yield run_id
@@ -47,7 +47,7 @@ def _run(conn: duckdb.DuckDBPyConnection, provider: str, dataset: str) -> Iterat
 
 
 @contextmanager
-def _transaction(conn: duckdb.DuckDBPyConnection) -> Iterator[None]:
+def transaction(conn: duckdb.DuckDBPyConnection) -> Iterator[None]:
     conn.execute("BEGIN TRANSACTION")
     try:
         yield
@@ -80,13 +80,13 @@ def sync_company(
     cnpj = next(s.cnpj for s in securities if s.ticker == ticker)
     report.cnpj = cnpj
 
-    with _run(conn, "cvm", "cad") as run_id:
+    with ingestion_run(conn, "cvm", "cad") as run_id:
         cad = fetcher.fetch(f"{cvm_base_url}/CAD/DADOS/cad_cia_aberta.csv")
         registry = cvm.parse_registry(cad.path, cnpj)
         if registry is None:
             raise TickerNotFoundError(f"CNPJ {cvm.format_cnpj(cnpj)} não está no cadastro da CVM")
         _record_once(conn, run_id, cad, cnpj, rows=1)
-    with _run(conn, "cvm", "fca") as run_id:
+    with ingestion_run(conn, "cvm", "fca") as run_id:
         _record_once(conn, run_id, fca_file, cnpj, rows=len(securities))
 
     report.name = registry.name
@@ -103,7 +103,7 @@ def sync_company(
         ("DFP", _years(today, config.history_years)),
         ("ITR", _years(today, config.quarterly_years)),
     ):
-        with _run(conn, "cvm", doc_type.lower()) as run_id:
+        with ingestion_run(conn, "cvm", doc_type.lower()) as run_id:
             pending = _download_documents(
                 conn, doc_type, years, cnpj, cvm_base_url, fetcher, report
             )
@@ -118,7 +118,7 @@ def sync_company(
                 report.accounting_template = template
                 _upsert_company(conn, registry, template, report.sector, securities)
             for remote, docs in pending:
-                with _transaction(conn):
+                with transaction(conn):
                     source_file_id = record_source_file(
                         conn, run_id, remote, rows_loaded=len(docs.facts), cnpjs=[cnpj]
                     )

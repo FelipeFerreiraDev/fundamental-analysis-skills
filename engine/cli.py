@@ -15,10 +15,9 @@ from engine.contract.export import SCHEMAS_DIR, export_schemas, outdated_schemas
 from engine.db import connect, init_database, pending_migrations
 from engine.db.reference import read_cvm_sector_map
 from engine.ingest.http import HttpFetcher, purge_expired_cache
+from engine.ingest.market_sync import sync_macro, sync_market
 from engine.ingest.sync import TickerNotFoundError, sync_company
-from engine.settings import PROJECT_ROOT, env_file_path, get_settings
-
-EXTERNAL_URLS = ("cvm_base_url", "b3_cotahist_base_url", "brapi_base_url", "bcb_sgs_base_url")
+from engine.settings import EXTERNAL_URL_FIELDS, PROJECT_ROOT, env_file_path, get_settings
 
 
 def _cmd_sync(args: argparse.Namespace) -> int:
@@ -48,6 +47,44 @@ def _cmd_sync(args: argparse.Namespace) -> int:
     print(f"documentos novos: {report.filings_added} | fatos novos: {report.facts_added}")
     for warning in report.warnings:
         print(f"aviso: {warning}")
+
+    print(f"cotações e proventos da B3 ({settings.b3_cotahist_base_url}) ...")
+    with connect(settings.db_path) as conn:
+        market = sync_market(
+            conn,
+            args.ticker,
+            cotahist_base_url=settings.b3_cotahist_base_url,
+            listed_base_url=settings.b3_listed_base_url,
+            brapi_base_url=settings.brapi_base_url,
+            brapi_token=settings.require_brapi_token() if settings.has_brapi_token() else None,
+            fetcher=HttpFetcher(settings.cache_dir / "b3"),
+            years=config.sync.history_years,
+        )
+        print(f"tickers: {', '.join(market.tickers)}")
+        print(f"arquivos COTAHIST carregados: {', '.join(market.price_files_loaded) or 'nenhum'}")
+        print(
+            f"arquivos COTAHIST sem mudança: {', '.join(market.price_files_unchanged) or 'nenhum'}"
+        )
+        print(f"pregões novos: {market.prices_added} | último pregão: {market.last_trade_date}")
+        print(f"proventos e eventos novos: {market.events_added}")
+        if market.quote:
+            print(
+                f"cotação brapi: {market.quote.ticker} R$ {_format_brl(market.quote.price)} "
+                f"em {market.quote.quoted_at:%Y-%m-%d %H:%M} UTC"
+            )
+        for warning in market.warnings:
+            print(f"aviso: {warning}")
+
+        print(f"séries do Banco Central ({settings.bcb_sgs_base_url}) ...")
+        macro_report = sync_macro(
+            conn,
+            sgs_base_url=settings.bcb_sgs_base_url,
+            fetcher=HttpFetcher(settings.cache_dir / "bcb"),
+            years=config.sync.history_years,
+        )
+        print(f"pontos novos: {macro_report.points_added}")
+        for series_code, (ref_date, value) in macro_report.last_points.items():
+            print(f"  {series_code}: {value} em {ref_date}")
     return 0
 
 
@@ -153,7 +190,7 @@ def _cmd_doctor(_: argparse.Namespace) -> int:
         else:
             report("ok", f"banco em {settings.db_path}")
 
-    for name in EXTERNAL_URLS:
+    for name in EXTERNAL_URL_FIELDS:
         report("ok", f"{name.upper()} = {getattr(settings, name)}")
 
     return 1 if errors else 0
@@ -179,7 +216,9 @@ def build_parser() -> argparse.ArgumentParser:
     export = sub.add_parser("export-schemas", help="gera os JSON Schemas do contrato em schemas/")
     export.add_argument("--check", action="store_true", help="só verifica se estão em dia")
     sub.add_parser("doctor", help="verifica .env, tokens, configuração, schemas, banco e URLs")
-    sync = sub.add_parser("sync", help="carrega no banco os dados da CVM de uma empresa")
+    sync = sub.add_parser(
+        "sync", help="carrega no banco os dados da CVM, B3, brapi e Banco Central de uma empresa"
+    )
     sync.add_argument("ticker", help="código de negociação, ex.: BBAS3")
     series = sub.add_parser("series", help="mostra a série histórica de um conceito no banco")
     series.add_argument("ticker", help="código de negociação, ex.: BBAS3")

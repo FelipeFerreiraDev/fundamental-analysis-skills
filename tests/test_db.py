@@ -36,7 +36,9 @@ def _seed_company(conn) -> str:
         [BB_CNPJ, datetime(2026, 11, 21)],
     )
     conn.execute(
-        "INSERT INTO securities VALUES ('BBAS3', ?, 'ON', DATE '2000-01-01', NULL)", [BB_CNPJ]
+        "INSERT INTO securities (ticker, cnpj, share_class, valid_from) "
+        "VALUES ('BBAS3', ?, 'ON', DATE '2000-01-01')",
+        [BB_CNPJ],
     )
     return file_id
 
@@ -118,7 +120,8 @@ def test_company_can_be_updated_while_referenced(conn):
     [
         "INSERT INTO companies (cnpj, cvm_code, name, accounting_template, sector, updated_at) "
         "VALUES ('1', 1, 'X', 'retail', NULL, now())",
-        "INSERT INTO securities VALUES ('XXXX3', '1', 'PREF', DATE '2020-01-01', NULL)",
+        "INSERT INTO securities (ticker, cnpj, share_class, valid_from) "
+        "VALUES ('XXXX3', '1', 'PREF', DATE '2020-01-01')",
     ],
 )
 def test_check_constraints_reject_invalid_categories(conn, sql):

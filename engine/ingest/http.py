@@ -49,6 +49,9 @@ class Fetcher(Protocol):
     def fetch(self, url: str) -> RemoteFile:
         """Local copy of the URL (from cache when the remote file did not change)."""
 
+    def download(self, url: str, headers: dict[str, str] | None = None) -> RemoteFile:
+        """Fresh copy of an API response (no HEAD, no reuse). Headers never reach the manifest."""
+
 
 def _parse_http_date(value: str | None) -> datetime | None:
     if not value:
@@ -108,6 +111,26 @@ class HttpFetcher:
         meta_path.write_text(json.dumps(cached), encoding="utf-8")
         return self._describe(url, path, cached, remote)
 
+    def download(self, url: str, headers: dict[str, str] | None = None) -> RemoteFile:
+        self.cache_dir.mkdir(parents=True, exist_ok=True)
+        retrieved_at = datetime.now(UTC)
+        key = hashlib.sha256(url.encode()).hexdigest()[:16]
+        path = self.cache_dir / f"{key}-{retrieved_at:%Y%m%dT%H%M%S%f}.json"
+        request = urllib.request.Request(url, headers={"User-Agent": USER_AGENT, **(headers or {})})
+        with urllib.request.urlopen(request, timeout=self.timeout) as resp:
+            path.write_bytes(resp.read())
+            etag = resp.headers.get("ETag")
+            last_modified = _parse_http_date(resp.headers.get("Last-Modified"))
+        return RemoteFile(
+            url=url,
+            path=path,
+            sha256=_sha256(path),
+            size_bytes=path.stat().st_size,
+            etag=etag,
+            last_modified=last_modified,
+            retrieved_at=retrieved_at.replace(tzinfo=None),
+        )
+
     def _describe(self, url: str, path: Path, cached: dict, remote: RemoteMetadata) -> RemoteFile:
         return RemoteFile(
             url=url,
@@ -126,7 +149,7 @@ def purge_expired_cache(cache_dir: Path, ttl_seconds: int = CACHE_TTL_SECONDS) -
         return 0
     limit = time.time() - ttl_seconds
     removed = 0
-    for path in cache_dir.iterdir():
+    for path in cache_dir.rglob("*"):
         if path.is_file() and path.stat().st_mtime < limit:
             path.unlink()
             removed += 1

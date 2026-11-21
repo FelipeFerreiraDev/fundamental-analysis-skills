@@ -65,8 +65,9 @@ def record_source_file(
             remote.etag,
         ],
     ).fetchone()[0]
-    conn.executemany(
-        "INSERT INTO source_file_scopes (source_file_id, cnpj) VALUES (?, ?)",
-        [[source_file_id, cnpj] for cnpj in cnpjs],
-    )
+    if cnpjs:
+        conn.executemany(
+            "INSERT INTO source_file_scopes (source_file_id, cnpj) VALUES (?, ?)",
+            [[source_file_id, cnpj] for cnpj in cnpjs],
+        )
     return source_file_id

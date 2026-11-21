@@ -18,9 +18,10 @@ O skillsInvest é um conjunto de analistas especializados (skills do Claude Code
 - ✅ **Fase 0 — fundação:** contrato de dados, banco local, CLI e testes.
 - 🚧 **Fase 1 — primeira análise completa com BBAS3:**
   - ✅ sync dos dados da CVM (cadastro, FCA, DFP e ITR) e mapa de contas de bancos
-  - ⏭️ cotações (B3 e brapi) e macro (Banco Central), snapshot, validação, indicadores, Graham, Bazin, relatório e as primeiras skills
+  - ✅ sync de cotações e proventos (B3), cotação do dia (brapi) e Selic/IPCA (Banco Central)
+  - ⏭️ snapshot da análise, validação, indicadores, Graham, Bazin, relatório e as primeiras skills
 
-As skills ainda não foram escritas. Hoje é possível carregar no banco local os balanços de uma empresa e consultar as séries históricas. O roadmap completo está em [docs/architecture.md](docs/architecture.md#10-roadmap).
+As skills ainda não foram escritas. Hoje é possível carregar no banco local os balanços, cotações e proventos de uma empresa e consultar as séries históricas. O roadmap completo está em [docs/architecture.md](docs/architecture.md#10-roadmap).
 
 ## Pré-requisitos
 
@@ -55,6 +56,7 @@ Com tudo configurado, o `doctor` mostra:
 [ok   ] banco em <projeto>/data/warehouse.duckdb
 [ok   ] CVM_BASE_URL = https://dados.cvm.gov.br/dados/CIA_ABERTA
 [ok   ] B3_COTAHIST_BASE_URL = https://bvmf.bmfbovespa.com.br/InstDados/SerHist
+[ok   ] B3_LISTED_BASE_URL = https://sistemaswebb3-listados.b3.com.br/listedCompaniesProxy/CompanyCall
 [ok   ] BRAPI_BASE_URL = https://brapi.dev/api
 [ok   ] BCB_SGS_BASE_URL = https://api.bcb.gov.br/dados/serie
 ```
@@ -73,6 +75,7 @@ Tokens e credenciais ficam **só no `.env`**, que nunca vai para o git. O [.env.
 | `DATA_DIR` | Pasta dos dados locais (banco, cache e PDFs) | ❌ | `data/` |
 | `CVM_BASE_URL` | Dados abertos da CVM (cadastro, FCA, DFP, ITR) | ❌ | `https://dados.cvm.gov.br/dados/CIA_ABERTA` |
 | `B3_COTAHIST_BASE_URL` | Séries históricas de cotações da B3 | ❌ | `https://bvmf.bmfbovespa.com.br/InstDados/SerHist` |
+| `B3_LISTED_BASE_URL` | Proventos e desdobramentos (API pública das páginas de empresas listadas da B3) | ❌ | `https://sistemaswebb3-listados.b3.com.br/listedCompaniesProxy/CompanyCall` |
 | `BRAPI_BASE_URL` | API da brapi.dev | ❌ | `https://brapi.dev/api` |
 | `BCB_SGS_BASE_URL` | Séries temporais do Banco Central (SGS) | ❌ | `https://api.bcb.gov.br/dados/serie` |
 
@@ -99,7 +102,7 @@ Com o ambiente ativado (`source .venv/bin/activate`):
 |---|---|
 | `skillsinvest init-db` | Cria `data/warehouse.duckdb`, se não existir, e aplica as migrações pendentes. Pode ser rodado quantas vezes quiser |
 | `skillsinvest doctor` | Verifica `.env`, `BRAPI_TOKEN`, `config/defaults.yaml`, schemas e banco, e mostra as URLs em uso |
-| `skillsinvest sync <TICKER>` | Carrega no banco os dados da CVM da empresa: cadastro, ações (FCA), DFP e ITR. Rodar de novo só baixa os arquivos que mudaram |
+| `skillsinvest sync <TICKER>` | Carrega no banco os dados da empresa: cadastro, ações, DFP e ITR (CVM); cotações diárias e proventos (B3); cotação do dia (brapi); Selic e IPCA (Banco Central). Rodar de novo só baixa o que mudou |
 | `skillsinvest series <TICKER> <conceito>` | Mostra a série histórica de um conceito, com o documento de origem de cada valor. Opções: `--period INSTANT\|3M\|YTD\|FY` e `--basis consolidated\|individual` |
 | `skillsinvest export-schemas` | Regenera os JSON Schemas em `schemas/` a partir de `engine/contract/` |
 | `skillsinvest export-schemas --check` | Só verifica se `schemas/` está em dia (termina com código 1 se não estiver) |
@@ -110,7 +113,7 @@ Com o ambiente ativado (`source .venv/bin/activate`):
 Exemplo:
 
 ```bash
-skillsinvest sync BBAS3                          # ~1 minuto na primeira vez
+skillsinvest sync BBAS3                          # ~2 a 5 minutos na primeira vez (baixa ~700 MB)
 skillsinvest series BBAS3 net_income --period FY
 ```
 
@@ -137,7 +140,7 @@ skillsinvest sync BBAS3
 
 Os downloads ficam em `data/cache/` por até 7 dias e depois são apagados. O que garante a rastreabilidade é o registro de cada arquivo no banco (URL, ETag e SHA-256), não o arquivo em si.
 
-Fontes usadas, todas gratuitas: CVM Dados Abertos (DFP, ITR e cadastro), B3 (COTAHIST), brapi.dev, Banco Central (SGS e IF.data) e Tesouro Direto.
+Fontes usadas, todas gratuitas: CVM Dados Abertos (DFP, ITR, FCA e cadastro), B3 (COTAHIST e a API das páginas de empresas listadas, para proventos e desdobramentos), brapi.dev (só a cotação do dia: no plano grátis ela não fornece proventos), Banco Central (SGS; IF.data na fase 3) e Tesouro Direto (fase 2).
 
 ## Desenvolvimento
 
@@ -165,7 +168,7 @@ As regras completas de trabalho estão no [CLAUDE.md](CLAUDE.md).
 │   ├── cli.py              # comando skillsinvest
 │   ├── contract/           # modelos do contrato de dados
 │   ├── db/                 # conexão e migrações do DuckDB
-│   ├── ingest/             # sync das fontes públicas (CVM)
+│   ├── ingest/             # sync das fontes públicas (CVM, B3, brapi, Banco Central)
 │   ├── reference/          # mapa de contas e mapa de setores da CVM
 │   └── ...                 # validação, indicadores, valuation, setores, relatório (próximas etapas)
 ├── tests/                  # testes e fixtures (BBAS3)

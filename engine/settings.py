@@ -22,6 +22,15 @@ def env_file_path() -> Path:
     return Path(os.environ.get("SKILLSINVEST_ENV_FILE", DEFAULT_ENV_FILE))
 
 
+EXTERNAL_URL_FIELDS = (
+    "cvm_base_url",
+    "b3_cotahist_base_url",
+    "b3_listed_base_url",
+    "brapi_base_url",
+    "bcb_sgs_base_url",
+)
+
+
 class MissingSettingError(RuntimeError):
     """Raised when a setting required by the current operation is not configured."""
 
@@ -40,10 +49,19 @@ class Settings(BaseSettings):
     # them in sync) so the project works before every URL is copied into .env.
     cvm_base_url: str = "https://dados.cvm.gov.br/dados/CIA_ABERTA"
     b3_cotahist_base_url: str = "https://bvmf.bmfbovespa.com.br/InstDados/SerHist"
+    b3_listed_base_url: str = (
+        "https://sistemaswebb3-listados.b3.com.br/listedCompaniesProxy/CompanyCall"
+    )
     brapi_base_url: str = "https://brapi.dev/api"
     bcb_sgs_base_url: str = "https://api.bcb.gov.br/dados/serie"
 
-    @field_validator("cvm_base_url", "b3_cotahist_base_url", "brapi_base_url", "bcb_sgs_base_url")
+    @field_validator(
+        "cvm_base_url",
+        "b3_cotahist_base_url",
+        "b3_listed_base_url",
+        "brapi_base_url",
+        "bcb_sgs_base_url",
+    )
     @classmethod
     def _check_url(cls, value: str) -> str:
         if not value.startswith("https://"):

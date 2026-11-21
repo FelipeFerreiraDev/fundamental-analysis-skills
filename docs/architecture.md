@@ -293,7 +293,7 @@ Formato comum de resultado de valuation:
 
 Views existentes: `v_financial_facts_latest` (último valor conhecido de cada conta e período), `v_concept_facts` (o mesmo, já como conceito do contrato) e `v_ingestion_freshness`. Próximas: trimestre isolado (incluindo 4T = DFP − 9M), últimos 12 meses (9M atual + ano anterior − 9M anterior) e preços ajustados por proventos e eventos.
 
-### 7.5 Sync da CVM
+### 7.5 Sync
 
 `skillsinvest sync <TICKER>`:
 
@@ -302,7 +302,14 @@ Views existentes: `v_financial_facts_latest` (último valor conhecido de cada co
 3. Para cada DFP (`sync.history_years`) e ITR (`sync.quarterly_years`): consulta o ETag; se aquele arquivo já foi carregado para a empresa, pula; senão baixa, filtra as linhas do CNPJ e grava documentos, contas e quantidade de ações numa transação por arquivo.
 4. Documentos já existentes (mesmo CNPJ, tipo, data e versão) não são regravados. Uma nova versão entra como novo documento.
 
-Regras de normalização: escala `MIL` × 1000, exceto o lucro por ação (DRE 3.99.*), que a CVM já publica em R$/ação; moeda diferente de `REAL` é rejeitada; balanço é `INSTANT`, fluxos do DFP são `FY`, fluxos do ITR que começam em 1º de janeiro são `YTD` (o 1º trimestre fica como `YTD`) e os demais são `3M`.
+Depois da CVM, o mesmo comando carrega:
+
+- **Cotações (COTAHIST):** só o mercado à vista (`TPMERC 010`) dos tickers da empresa; preço = valor / 100 / fator de cotação. O ISIN de cada ticker é guardado.
+- **Proventos e eventos de ações (B3):** valores exatamente como publicados (até 14 casas decimais), sem ajuste. Desdobramentos e bonificações vêm em percentual (100 = 2 por 1) e grupamentos como razão (0,001 = 1.000 por 1); ambos são guardados como "ações novas por ação antiga". O ajuste de séries por eventos é calculado depois, sem alterar essas linhas.
+- **Cotação do dia (brapi):** o token vai no cabeçalho HTTP e nunca aparece na URL gravada no manifest.
+- **Selic e IPCA (SGS):** convertidos de percentual para fração. A série da meta Selic traz dias futuros (até a próxima reunião do Copom), que são descartados. Consultas em janelas de 5 anos (o limite da API para séries diárias é 10).
+
+Regras de normalização da CVM: escala `MIL` × 1000, exceto o lucro por ação (DRE 3.99.*), que a CVM já publica em R$/ação; moeda diferente de `REAL` é rejeitada; balanço é `INSTANT`, fluxos do DFP são `FY`, fluxos do ITR que começam em 1º de janeiro são `YTD` (o 1º trimestre fica como `YTD`) e os demais são `3M`.
 
 ### 7.4 Atualização
 
@@ -314,8 +321,9 @@ Sob demanda: antes de uma análise, o `sync` verifica quais fontes estão desatu
 |---|---|---|
 | CVM Dados Abertos — DFP, ITR, FCA, cadastro | Demonstrações financeiras padronizadas, tickers e classes de ações | Semanal: os arquivos de DFP e ITR são regenerados juntos (ambos com Last-Modified de 15/11/2026). DFP desde 2010, ITR desde 2011 |
 | Site de RI da empresa (PDF) | Trimestre ainda não publicado na CVM, lucro recorrente, guidance, dados gerenciais, Pilar 3 dos bancos | No dia da divulgação |
-| B3 COTAHIST | Histórico oficial de cotações (sem ajuste) | Diário |
-| brapi.dev (plano grátis, `BRAPI_TOKEN` no `.env`) | Cotação do dia | Quase tempo real; 15.000 req/mês, 1 ticker por chamada |
+| B3 COTAHIST | Histórico oficial de cotações (sem ajuste) e ISIN de cada ação | Diário; arquivo anual (~100 MB) |
+| B3 — API das páginas de empresas listadas | Histórico de proventos (data-com, tipo, valor por ação desde os anos 1990) e desdobramentos, grupamentos e bonificações | A cada evento. É a API pública usada pelo site da B3, sem documentação oficial: o parser rejeita respostas fora do formato esperado |
+| brapi.dev (plano grátis, `BRAPI_TOKEN` no `.env`) | Só a cotação do dia (proventos exigem plano pago) | Quase tempo real; 15.000 req/mês, 1 ticker por chamada |
 | BCB SGS | Selic, IPCA | Diário / mensal |
 | BCB IF.data | Indicadores prudenciais de todos os bancos na mesma data-base | Trimestral (60 dias após mar/jun/set, 90 após dez) |
 | Tesouro Direto | Taxas das NTN-B (taxa livre de risco) | Diário |
@@ -357,7 +365,7 @@ Primeira empresa: **BBAS3**. Um banco testa logo o caso mais difícil do contrat
 - [x] Criar token gratuito da brapi e colocar no `.env` como `BRAPI_TOKEN` (BBAS3 não está entre os tickers liberados sem token).
 - [x] Mapear o `SETOR_ATIV` do cadastro da CVM para perfil setorial (o template contábil é detectado no DFP).
 - [ ] Mapa de contas para `non_financial` e `insurance` (com a primeira empresa de cada tipo).
-- [ ] Fonte gratuita confiável de **histórico de proventos por ação** (data-com, JCP bruto/líquido, extraordinários) — necessária na fase 1 para o Bazin.
+- [x] Fonte gratuita de **histórico de proventos por ação**: API das páginas de empresas listadas da B3 (a brapi cobra por esse dado). JCP vem bruto; "RENDIMENTO" (correção do JCP entre a data-com e o pagamento) fica como `other`. Proventos extraordinários ainda precisam ser identificados na validação.
 - [x] Confirmar a periodicidade de atualização do conjunto DFP na CVM (semanal, junto com o ITR).
 - [ ] Definir valores padrão de `config/defaults.yaml` além do DY de 6% (margem de segurança, janela do Bazin, Ke).
 - [ ] **README inicial (fase 0):** instalação, configuração do `.env`, `data/` (banco, cache e PDFs) fora do git e como reconstruir com `sync`. Depois disso, atualizado a cada mudança de execução.

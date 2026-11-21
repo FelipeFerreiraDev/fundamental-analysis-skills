@@ -85,11 +85,16 @@ class FakeFetcher:
     files: dict[str, Path] = field(default_factory=dict)
     etags: dict[str, str] = field(default_factory=dict)
     downloads: list[str] = field(default_factory=list)
+    headers: dict[str, dict[str, str]] = field(default_factory=dict)
 
     def metadata(self, url: str) -> RemoteMetadata | None:
         if url not in self.files:
             return None
         return RemoteMetadata(url, self.etags.get(url, "v1"), datetime(2026, 11, 15))
+
+    def download(self, url: str, headers: dict[str, str] | None = None) -> RemoteFile:
+        self.headers[url] = dict(headers or {})
+        return self.fetch(url)
 
     def fetch(self, url: str) -> RemoteFile:
         if url not in self.files:
