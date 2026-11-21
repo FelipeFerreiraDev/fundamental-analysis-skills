@@ -105,7 +105,7 @@ def _analysis(**overrides) -> dict:
 class TestAnalysisData:
     def test_valid_snapshot(self):
         data = AnalysisData(**_analysis())
-        assert data.schema_version == "0.2.0"
+        assert data.schema_version == "0.3.0"
 
     def test_unknown_source_reference_is_rejected(self):
         financials = {"net_income": [reported("1", source_ids=["missing"])]}
@@ -145,7 +145,7 @@ def _valuation(**overrides) -> dict:
         "inputs": {"eps": reported("2", "BRL/share")},
         "result": {"fair_value": "20.00"},
         "applicability_rationale": "lucro e patrimônio positivos",
-        "engine_version": "0.2.0",
+        "engine_version": "0.3.0",
         "computed_at": datetime(2026, 11, 21, 12, 0),
     }
     return {**base, **overrides}

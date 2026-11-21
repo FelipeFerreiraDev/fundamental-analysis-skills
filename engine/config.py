@@ -6,11 +6,12 @@ the parameter has not been decided yet; methods that depend on it must refuse to
 
 from __future__ import annotations
 
+from datetime import date
 from decimal import Decimal
 from pathlib import Path
 
 import yaml
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 from engine.settings import PROJECT_ROOT
 
@@ -22,13 +23,44 @@ class _ConfigModel(BaseModel):
 
 
 class ValuationConfig(_ConfigModel):
-    margin_of_safety: Decimal | None = Field(default=None, ge=0, lt=1)
+    margins_of_safety: list[Decimal] = Field(default_factory=list)
     cost_of_equity: Decimal | None = Field(default=None, gt=0, lt=1)
+
+    @field_validator("margins_of_safety")
+    @classmethod
+    def _check_margins(cls, margins: list[Decimal]) -> list[Decimal]:
+        if any(not 0 <= m < 1 for m in margins):
+            raise ValueError("margins of safety must be fractions in [0, 1)")
+        if len(set(margins)) != len(margins):
+            raise ValueError("margins of safety must not repeat")
+        return sorted(margins)
+
+
+class WithholdingRate(_ConfigModel):
+    since: date
+    rate: Decimal = Field(ge=0, lt=1)
 
 
 class BazinConfig(_ConfigModel):
     target_dividend_yield: Decimal = Field(gt=0, lt=1)
     lookback_years: int | None = Field(default=None, ge=1)
+    include_jcp_correction: bool = True
+    jcp_withholding_rates: list[WithholdingRate] = Field(default_factory=list)
+
+    @field_validator("jcp_withholding_rates")
+    @classmethod
+    def _sorted_rates(cls, rates: list[WithholdingRate]) -> list[WithholdingRate]:
+        ordered = sorted(rates, key=lambda r: r.since)
+        if len({r.since for r in ordered}) != len(ordered):
+            raise ValueError("withholding rates must have distinct start dates")
+        return ordered
+
+    def jcp_rate_on(self, day: date) -> Decimal:
+        """Withholding rate in force on `day` (payment date of the JCP)."""
+        applicable = [r for r in self.jcp_withholding_rates if r.since <= day]
+        if not applicable:
+            raise ValueError(f"no JCP withholding rate configured for {day}")
+        return applicable[-1].rate
 
 
 class SyncConfig(_ConfigModel):

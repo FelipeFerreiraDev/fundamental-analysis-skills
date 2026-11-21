@@ -1,0 +1,1326 @@
+{
+  "schema_version": "0.3.0",
+  "ticker": "BBAS3",
+  "reference_date": "2026-09-30",
+  "snapshot_as_of": "2026-11-21T15:39:37",
+  "generated_at": "2026-11-21T15:39:38",
+  "engine_version": "0.1.0",
+  "values": {
+    "net_income_ltm": {
+      "value": "11016424000.0000",
+      "unit": "BRL",
+      "period": {
+        "type": "LTM",
+        "start": "2025-10-01",
+        "end": "2026-09-30"
+      },
+      "basis": null,
+      "nature": "derived",
+      "source_ids": [
+        "cvm-dfp-2025-12-31-v1",
+        "cvm-itr-2026-09-30-v1"
+      ],
+      "confidence": "high",
+      "note": "net_income: acumulado até 2026-09-30 (5.776.488.000,00) + exercício 2025 (13.698.124.000,00) − acumulado até 2025-09-30 (8.458.188.000,00)"
+    },
+    "equity": {
+      "value": "186146636000.0000",
+      "unit": "BRL",
+      "period": {
+        "type": "INSTANT",
+        "start": null,
+        "end": "2026-09-30"
+      },
+      "basis": "consolidated",
+      "nature": "reported",
+      "source_ids": [
+        "cvm-itr-2026-09-30-v1"
+      ],
+      "confidence": "high",
+      "note": null
+    },
+    "shares_outstanding": {
+      "value": "5709020778",
+      "unit": "shares",
+      "period": {
+        "type": "INSTANT",
+        "start": null,
+        "end": "2026-09-30"
+      },
+      "basis": null,
+      "nature": "derived",
+      "source_ids": [
+        "cvm-itr-2026-09-30-v1"
+      ],
+      "confidence": "high",
+      "note": "ações emitidas (5730834040) − ações em tesouraria (21813262)"
+    },
+    "price": {
+      "value": "14.3000",
+      "unit": "BRL/share",
+      "period": {
+        "type": "INSTANT",
+        "start": null,
+        "end": "2026-11-20"
+      },
+      "basis": null,
+      "nature": "reported",
+      "source_ids": [
+        "brapi-quote-7a6915163547"
+      ],
+      "confidence": "high",
+      "note": null
+    },
+    "eps_ltm": {
+      "value": "1.92965211",
+      "unit": "BRL/share",
+      "period": {
+        "type": "LTM",
+        "start": "2025-10-01",
+        "end": "2026-09-30"
+      },
+      "basis": null,
+      "nature": "derived",
+      "source_ids": [
+        "cvm-dfp-2025-12-31-v1",
+        "cvm-itr-2026-09-30-v1"
+      ],
+      "confidence": "high",
+      "note": "lucro líquido do controlador nos últimos 12 meses ÷ ações em circulação na data-base (o LPA reportado usa a média ponderada de ações)"
+    },
+    "bvps": {
+      "value": "32.60570302",
+      "unit": "BRL/share",
+      "period": {
+        "type": "INSTANT",
+        "start": null,
+        "end": "2026-09-30"
+      },
+      "basis": null,
+      "nature": "derived",
+      "source_ids": [
+        "cvm-itr-2026-09-30-v1"
+      ],
+      "confidence": "high",
+      "note": "patrimônio do controlador ÷ ações em circulação na data-base"
+    },
+    "roe_ltm": {
+      "value": "0.05982853955833003651358270775",
+      "unit": "ratio",
+      "period": {
+        "type": "LTM",
+        "start": "2025-10-01",
+        "end": "2026-09-30"
+      },
+      "basis": null,
+      "nature": "derived",
+      "source_ids": [
+        "cvm-dfp-2025-12-31-v1",
+        "cvm-itr-2025-09-30-v1",
+        "cvm-itr-2026-09-30-v1"
+      ],
+      "confidence": "high",
+      "note": "lucro dos últimos 12 meses ÷ média do patrimônio do controlador no início e no fim do período"
+    },
+    "pe_ratio": {
+      "value": "7.410662225534529122972326862",
+      "unit": "ratio",
+      "period": {
+        "type": "INSTANT",
+        "start": null,
+        "end": "2026-11-20"
+      },
+      "basis": null,
+      "nature": "derived",
+      "source_ids": [
+        "brapi-quote-7a6915163547",
+        "cvm-dfp-2025-12-31-v1",
+        "cvm-itr-2026-09-30-v1"
+      ],
+      "confidence": "high",
+      "note": "preço ÷ LPA dos últimos 12 meses"
+    },
+    "pb_ratio": {
+      "value": "0.4385735830087309677029622899",
+      "unit": "ratio",
+      "period": {
+        "type": "INSTANT",
+        "start": null,
+        "end": "2026-11-20"
+      },
+      "basis": null,
+      "nature": "derived",
+      "source_ids": [
+        "brapi-quote-7a6915163547",
+        "cvm-itr-2026-09-30-v1"
+      ],
+      "confidence": "high",
+      "note": "preço ÷ valor patrimonial por ação"
+    },
+    "dividends_per_share_ltm_gross": {
+      "value": "0.69043176",
+      "unit": "BRL/share",
+      "period": {
+        "type": "LTM",
+        "start": "2025-11-22",
+        "end": "2026-11-21"
+      },
+      "basis": null,
+      "nature": "derived",
+      "source_ids": [
+        "b3-corporate_events-bc1b44d55229"
+      ],
+      "confidence": "high",
+      "note": "últimos 12 meses: soma de 10 proventos com data-com entre 2025-11-22 e 2026-11-21 (JRS CAP PROPRIO, RENDIMENTO), por ação atual (ajustados por desdobramentos, grupamentos e bonificações)"
+    },
+    "dividend_yield_ltm_gross": {
+      "value": "0.04828194125874125874125874126",
+      "unit": "ratio",
+      "period": {
+        "type": "INSTANT",
+        "start": null,
+        "end": "2026-11-20"
+      },
+      "basis": null,
+      "nature": "derived",
+      "source_ids": [
+        "b3-corporate_events-bc1b44d55229",
+        "brapi-quote-7a6915163547"
+      ],
+      "confidence": "high",
+      "note": "proventos por ação dos últimos 12 meses ÷ preço"
+    },
+    "dividends_per_share_ltm_net": {
+      "value": "0.57395041",
+      "unit": "BRL/share",
+      "period": {
+        "type": "LTM",
+        "start": "2025-11-22",
+        "end": "2026-11-21"
+      },
+      "basis": null,
+      "nature": "derived",
+      "source_ids": [
+        "b3-corporate_events-bc1b44d55229"
+      ],
+      "confidence": "high",
+      "note": "últimos 12 meses: soma de 10 proventos com data-com entre 2025-11-22 e 2026-11-21 (JRS CAP PROPRIO, RENDIMENTO), por ação atual (ajustados por desdobramentos, grupamentos e bonificações); JCP líquido do IR retido na fonte pela alíquota da data de pagamento"
+    },
+    "dividend_yield_ltm_net": {
+      "value": "0.04013639230769230769230769231",
+      "unit": "ratio",
+      "period": {
+        "type": "INSTANT",
+        "start": null,
+        "end": "2026-11-20"
+      },
+      "basis": null,
+      "nature": "derived",
+      "source_ids": [
+        "b3-corporate_events-bc1b44d55229",
+        "brapi-quote-7a6915163547"
+      ],
+      "confidence": "high",
+      "note": "proventos por ação dos últimos 12 meses ÷ preço"
+    }
+  },
+  "series": {
+    "dividends_per_share_annual_gross": [
+      {
+        "value": "56.25000000",
+        "unit": "BRL/share",
+        "period": {
+          "type": "FY",
+          "start": "1997-01-01",
+          "end": "1997-12-31"
+        },
+        "basis": null,
+        "nature": "derived",
+        "source_ids": [
+          "b3-corporate_events-7f2a7e8aef3c"
+        ],
+        "confidence": "high",
+        "note": "ano 1997: soma de 1 proventos com data-com entre 1997-01-01 e 1997-12-31 (DIVIDENDO), por ação atual (ajustados por desdobramentos, grupamentos e bonificações)"
+      },
+      {
+        "value": "135.34500000",
+        "unit": "BRL/share",
+        "period": {
+          "type": "FY",
+          "start": "1998-01-01",
+          "end": "1998-12-31"
+        },
+        "basis": null,
+        "nature": "derived",
+        "source_ids": [
+          "b3-corporate_events-7f2a7e8aef3c"
+        ],
+        "confidence": "high",
+        "note": "ano 1998: soma de 2 proventos com data-com entre 1998-01-01 e 1998-12-31 (DIVIDENDO, JRS CAP PROPRIO), por ação atual (ajustados por desdobramentos, grupamentos e bonificações)"
+      },
+      {
+        "value": "197.62485000",
+        "unit": "BRL/share",
+        "period": {
+          "type": "FY",
+          "start": "1999-01-01",
+          "end": "1999-12-31"
+        },
+        "basis": null,
+        "nature": "derived",
+        "source_ids": [
+          "b3-corporate_events-7f2a7e8aef3c"
+        ],
+        "confidence": "high",
+        "note": "ano 1999: soma de 3 proventos com data-com entre 1999-01-01 e 1999-12-31 (JRS CAP PROPRIO, RENDIMENTO), por ação atual (ajustados por desdobramentos, grupamentos e bonificações)"
+      },
+      {
+        "value": "127.55500000",
+        "unit": "BRL/share",
+        "period": {
+          "type": "FY",
+          "start": "2000-01-01",
+          "end": "2000-12-31"
+        },
+        "basis": null,
+        "nature": "derived",
+        "source_ids": [
+          "b3-corporate_events-7f2a7e8aef3c"
+        ],
+        "confidence": "high",
+        "note": "ano 2000: soma de 4 proventos com data-com entre 2000-01-01 e 2000-12-31 (JRS CAP PROPRIO, RENDIMENTO), por ação atual (ajustados por desdobramentos, grupamentos e bonificações)"
+      },
+      {
+        "value": "154.51020000",
+        "unit": "BRL/share",
+        "period": {
+          "type": "FY",
+          "start": "2001-01-01",
+          "end": "2001-12-31"
+        },
+        "basis": null,
+        "nature": "derived",
+        "source_ids": [
+          "b3-corporate_events-7f2a7e8aef3c"
+        ],
+        "confidence": "high",
+        "note": "ano 2001: soma de 4 proventos com data-com entre 2001-01-01 e 2001-12-31 (DIVIDENDO, RENDIMENTO), por ação atual (ajustados por desdobramentos, grupamentos e bonificações)"
+      },
+      {
+        "value": "342.62768350",
+        "unit": "BRL/share",
+        "period": {
+          "type": "FY",
+          "start": "2002-01-01",
+          "end": "2002-12-31"
+        },
+        "basis": null,
+        "nature": "derived",
+        "source_ids": [
+          "b3-corporate_events-7f2a7e8aef3c"
+        ],
+        "confidence": "high",
+        "note": "ano 2002: soma de 4 proventos com data-com entre 2002-01-01 e 2002-12-31 (DIVIDENDO, RENDIMENTO), por ação atual (ajustados por desdobramentos, grupamentos e bonificações)"
+      },
+      {
+        "value": "417.11500000",
+        "unit": "BRL/share",
+        "period": {
+          "type": "FY",
+          "start": "2003-01-01",
+          "end": "2003-12-31"
+        },
+        "basis": null,
+        "nature": "derived",
+        "source_ids": [
+          "b3-corporate_events-255a6404dd55"
+        ],
+        "confidence": "high",
+        "note": "ano 2003: soma de 4 proventos com data-com entre 2003-01-01 e 2003-12-31 (DIVIDENDO, JRS CAP PROPRIO, RENDIMENTO), por ação atual (ajustados por desdobramentos, grupamentos e bonificações)"
+      },
+      {
+        "value": "0.78321600",
+        "unit": "BRL/share",
+        "period": {
+          "type": "FY",
+          "start": "2004-01-01",
+          "end": "2004-12-31"
+        },
+        "basis": null,
+        "nature": "derived",
+        "source_ids": [
+          "b3-corporate_events-255a6404dd55"
+        ],
+        "confidence": "high",
+        "note": "ano 2004: soma de 5 proventos com data-com entre 2004-01-01 e 2004-12-31 (JRS CAP PROPRIO, RENDIMENTO), por ação atual (ajustados por desdobramentos, grupamentos e bonificações)"
+      },
+      {
+        "value": "0.54605000",
+        "unit": "BRL/share",
+        "period": {
+          "type": "FY",
+          "start": "2005-01-01",
+          "end": "2005-12-31"
+        },
+        "basis": null,
+        "nature": "derived",
+        "source_ids": [
+          "b3-corporate_events-255a6404dd55"
+        ],
+        "confidence": "high",
+        "note": "ano 2005: soma de 4 proventos com data-com entre 2005-01-01 e 2005-12-31 (JRS CAP PROPRIO, RENDIMENTO), por ação atual (ajustados por desdobramentos, grupamentos e bonificações)"
+      },
+      {
+        "value": "2.40955500",
+        "unit": "BRL/share",
+        "period": {
+          "type": "FY",
+          "start": "2006-01-01",
+          "end": "2006-12-31"
+        },
+        "basis": null,
+        "nature": "derived",
+        "source_ids": [
+          "b3-corporate_events-255a6404dd55"
+        ],
+        "confidence": "high",
+        "note": "ano 2006: soma de 11 proventos com data-com entre 2006-01-01 e 2006-12-31 (DIVIDENDO, JRS CAP PROPRIO, RENDIMENTO), por ação atual (ajustados por desdobramentos, grupamentos e bonificações)"
+      },
+      {
+        "value": "0.71981402",
+        "unit": "BRL/share",
+        "period": {
+          "type": "FY",
+          "start": "2007-01-01",
+          "end": "2007-12-31"
+        },
+        "basis": null,
+        "nature": "derived",
+        "source_ids": [
+          "b3-corporate_events-255a6404dd55"
+        ],
+        "confidence": "high",
+        "note": "ano 2007: soma de 11 proventos com data-com entre 2007-01-01 e 2007-12-31 (DIVIDENDO, JRS CAP PROPRIO, RENDIMENTO), por ação atual (ajustados por desdobramentos, grupamentos e bonificações)"
+      },
+      {
+        "value": "0.56885039",
+        "unit": "BRL/share",
+        "period": {
+          "type": "FY",
+          "start": "2008-01-01",
+          "end": "2008-12-31"
+        },
+        "basis": null,
+        "nature": "derived",
+        "source_ids": [
+          "b3-corporate_events-255a6404dd55"
+        ],
+        "confidence": "high",
+        "note": "ano 2008: soma de 10 proventos com data-com entre 2008-01-01 e 2008-12-31 (DIVIDENDO, JRS CAP PROPRIO, RENDIMENTO), por ação atual (ajustados por desdobramentos, grupamentos e bonificações)"
+      },
+      {
+        "value": "0.71319107",
+        "unit": "BRL/share",
+        "period": {
+          "type": "FY",
+          "start": "2009-01-01",
+          "end": "2009-12-31"
+        },
+        "basis": null,
+        "nature": "derived",
+        "source_ids": [
+          "b3-corporate_events-255a6404dd55"
+        ],
+        "confidence": "high",
+        "note": "ano 2009: soma de 10 proventos com data-com entre 2009-01-01 e 2009-12-31 (DIVIDENDO, JRS CAP PROPRIO, RENDIMENTO), por ação atual (ajustados por desdobramentos, grupamentos e bonificações)"
+      },
+      {
+        "value": "0.92643358",
+        "unit": "BRL/share",
+        "period": {
+          "type": "FY",
+          "start": "2010-01-01",
+          "end": "2010-12-31"
+        },
+        "basis": null,
+        "nature": "derived",
+        "source_ids": [
+          "b3-corporate_events-255a6404dd55"
+        ],
+        "confidence": "high",
+        "note": "ano 2010: soma de 10 proventos com data-com entre 2010-01-01 e 2010-12-31 (DIVIDENDO, JRS CAP PROPRIO, RENDIMENTO), por ação atual (ajustados por desdobramentos, grupamentos e bonificações)"
+      },
+      {
+        "value": "0.94299571",
+        "unit": "BRL/share",
+        "period": {
+          "type": "FY",
+          "start": "2011-01-01",
+          "end": "2011-12-31"
+        },
+        "basis": null,
+        "nature": "derived",
+        "source_ids": [
+          "b3-corporate_events-255a6404dd55"
+        ],
+        "confidence": "high",
+        "note": "ano 2011: soma de 10 proventos com data-com entre 2011-01-01 e 2011-12-31 (DIVIDENDO, JRS CAP PROPRIO, RENDIMENTO), por ação atual (ajustados por desdobramentos, grupamentos e bonificações)"
+      },
+      {
+        "value": "0.81183326",
+        "unit": "BRL/share",
+        "period": {
+          "type": "FY",
+          "start": "2012-01-01",
+          "end": "2012-12-31"
+        },
+        "basis": null,
+        "nature": "derived",
+        "source_ids": [
+          "b3-corporate_events-255a6404dd55"
+        ],
+        "confidence": "high",
+        "note": "ano 2012: soma de 10 proventos com data-com entre 2012-01-01 e 2012-12-31 (DIVIDENDO, JRS CAP PROPRIO, RENDIMENTO), por ação atual (ajustados por desdobramentos, grupamentos e bonificações)"
+      },
+      {
+        "value": "1.18849778",
+        "unit": "BRL/share",
+        "period": {
+          "type": "FY",
+          "start": "2013-01-01",
+          "end": "2013-12-31"
+        },
+        "basis": null,
+        "nature": "derived",
+        "source_ids": [
+          "b3-corporate_events-255a6404dd55"
+        ],
+        "confidence": "high",
+        "note": "ano 2013: soma de 10 proventos com data-com entre 2013-01-01 e 2013-12-31 (DIVIDENDO, JRS CAP PROPRIO, RENDIMENTO), por ação atual (ajustados por desdobramentos, grupamentos e bonificações)"
+      },
+      {
+        "value": "0.83002832",
+        "unit": "BRL/share",
+        "period": {
+          "type": "FY",
+          "start": "2014-01-01",
+          "end": "2014-12-31"
+        },
+        "basis": null,
+        "nature": "derived",
+        "source_ids": [
+          "b3-corporate_events-255a6404dd55"
+        ],
+        "confidence": "high",
+        "note": "ano 2014: soma de 10 proventos com data-com entre 2014-01-01 e 2014-12-31 (DIVIDENDO, JRS CAP PROPRIO, RENDIMENTO), por ação atual (ajustados por desdobramentos, grupamentos e bonificações)"
+      },
+      {
+        "value": "1.03120243",
+        "unit": "BRL/share",
+        "period": {
+          "type": "FY",
+          "start": "2015-01-01",
+          "end": "2015-12-31"
+        },
+        "basis": null,
+        "nature": "derived",
+        "source_ids": [
+          "b3-corporate_events-255a6404dd55"
+        ],
+        "confidence": "high",
+        "note": "ano 2015: soma de 12 proventos com data-com entre 2015-01-01 e 2015-12-31 (DIVIDENDO, JRS CAP PROPRIO, RENDIMENTO), por ação atual (ajustados por desdobramentos, grupamentos e bonificações)"
+      },
+      {
+        "value": "0.45685528",
+        "unit": "BRL/share",
+        "period": {
+          "type": "FY",
+          "start": "2016-01-01",
+          "end": "2016-12-31"
+        },
+        "basis": null,
+        "nature": "derived",
+        "source_ids": [
+          "b3-corporate_events-255a6404dd55",
+          "b3-corporate_events-bc1b44d55229"
+        ],
+        "confidence": "high",
+        "note": "ano 2016: soma de 10 proventos com data-com entre 2016-01-01 e 2016-12-31 (JRS CAP PROPRIO, RENDIMENTO), por ação atual (ajustados por desdobramentos, grupamentos e bonificações)"
+      },
+      {
+        "value": "0.47298242",
+        "unit": "BRL/share",
+        "period": {
+          "type": "FY",
+          "start": "2017-01-01",
+          "end": "2017-12-31"
+        },
+        "basis": null,
+        "nature": "derived",
+        "source_ids": [
+          "b3-corporate_events-bc1b44d55229"
+        ],
+        "confidence": "high",
+        "note": "ano 2017: soma de 10 proventos com data-com entre 2017-01-01 e 2017-12-31 (JRS CAP PROPRIO, RENDIMENTO), por ação atual (ajustados por desdobramentos, grupamentos e bonificações)"
+      },
+      {
+        "value": "0.75812867",
+        "unit": "BRL/share",
+        "period": {
+          "type": "FY",
+          "start": "2018-01-01",
+          "end": "2018-12-31"
+        },
+        "basis": null,
+        "nature": "derived",
+        "source_ids": [
+          "b3-corporate_events-bc1b44d55229"
+        ],
+        "confidence": "high",
+        "note": "ano 2018: soma de 10 proventos com data-com entre 2018-01-01 e 2018-12-31 (JRS CAP PROPRIO, RENDIMENTO), por ação atual (ajustados por desdobramentos, grupamentos e bonificações)"
+      },
+      {
+        "value": "1.27711675",
+        "unit": "BRL/share",
+        "period": {
+          "type": "FY",
+          "start": "2019-01-01",
+          "end": "2019-12-31"
+        },
+        "basis": null,
+        "nature": "derived",
+        "source_ids": [
+          "b3-corporate_events-bc1b44d55229"
+        ],
+        "confidence": "high",
+        "note": "ano 2019: soma de 10 proventos com data-com entre 2019-01-01 e 2019-12-31 (JRS CAP PROPRIO, RENDIMENTO), por ação atual (ajustados por desdobramentos, grupamentos e bonificações)"
+      },
+      {
+        "value": "0.73855527",
+        "unit": "BRL/share",
+        "period": {
+          "type": "FY",
+          "start": "2020-01-01",
+          "end": "2020-12-31"
+        },
+        "basis": null,
+        "nature": "derived",
+        "source_ids": [
+          "b3-corporate_events-bc1b44d55229"
+        ],
+        "confidence": "high",
+        "note": "ano 2020: soma de 8 proventos com data-com entre 2020-01-01 e 2020-12-31 (JRS CAP PROPRIO, RENDIMENTO), por ação atual (ajustados por desdobramentos, grupamentos e bonificações)"
+      },
+      {
+        "value": "1.13313296",
+        "unit": "BRL/share",
+        "period": {
+          "type": "FY",
+          "start": "2021-01-01",
+          "end": "2021-12-31"
+        },
+        "basis": null,
+        "nature": "derived",
+        "source_ids": [
+          "b3-corporate_events-bc1b44d55229"
+        ],
+        "confidence": "high",
+        "note": "ano 2021: soma de 11 proventos com data-com entre 2021-01-01 e 2021-12-31 (DIVIDENDO, JRS CAP PROPRIO, RENDIMENTO), por ação atual (ajustados por desdobramentos, grupamentos e bonificações)"
+      },
+      {
+        "value": "2.08529464",
+        "unit": "BRL/share",
+        "period": {
+          "type": "FY",
+          "start": "2022-01-01",
+          "end": "2022-12-31"
+        },
+        "basis": null,
+        "nature": "derived",
+        "source_ids": [
+          "b3-corporate_events-bc1b44d55229"
+        ],
+        "confidence": "high",
+        "note": "ano 2022: soma de 16 proventos com data-com entre 2022-01-01 e 2022-12-31 (DIVIDENDO, JRS CAP PROPRIO, RENDIMENTO), por ação atual (ajustados por desdobramentos, grupamentos e bonificações)"
+      },
+      {
+        "value": "2.28770996",
+        "unit": "BRL/share",
+        "period": {
+          "type": "FY",
+          "start": "2023-01-01",
+          "end": "2023-12-31"
+        },
+        "basis": null,
+        "nature": "derived",
+        "source_ids": [
+          "b3-corporate_events-bc1b44d55229"
+        ],
+        "confidence": "high",
+        "note": "ano 2023: soma de 16 proventos com data-com entre 2023-01-01 e 2023-12-31 (DIVIDENDO, JRS CAP PROPRIO, RENDIMENTO), por ação atual (ajustados por desdobramentos, grupamentos e bonificações)"
+      },
+      {
+        "value": "2.61289732",
+        "unit": "BRL/share",
+        "period": {
+          "type": "FY",
+          "start": "2024-01-01",
+          "end": "2024-12-31"
+        },
+        "basis": null,
+        "nature": "derived",
+        "source_ids": [
+          "b3-corporate_events-bc1b44d55229"
+        ],
+        "confidence": "high",
+        "note": "ano 2024: soma de 15 proventos com data-com entre 2024-01-01 e 2024-12-31 (DIVIDENDO, JRS CAP PROPRIO, RENDIMENTO), por ação atual (ajustados por desdobramentos, grupamentos e bonificações)"
+      },
+      {
+        "value": "1.18288670",
+        "unit": "BRL/share",
+        "period": {
+          "type": "FY",
+          "start": "2025-01-01",
+          "end": "2025-12-31"
+        },
+        "basis": null,
+        "nature": "derived",
+        "source_ids": [
+          "b3-corporate_events-bc1b44d55229"
+        ],
+        "confidence": "high",
+        "note": "ano 2025: soma de 9 proventos com data-com entre 2025-01-01 e 2025-12-31 (DIVIDENDO, JRS CAP PROPRIO, RENDIMENTO), por ação atual (ajustados por desdobramentos, grupamentos e bonificações)"
+      }
+    ],
+    "dividends_per_share_annual_net": [
+      {
+        "value": "56.25000000",
+        "unit": "BRL/share",
+        "period": {
+          "type": "FY",
+          "start": "1997-01-01",
+          "end": "1997-12-31"
+        },
+        "basis": null,
+        "nature": "derived",
+        "source_ids": [
+          "b3-corporate_events-7f2a7e8aef3c"
+        ],
+        "confidence": "high",
+        "note": "ano 1997: soma de 1 proventos com data-com entre 1997-01-01 e 1997-12-31 (DIVIDENDO), por ação atual (ajustados por desdobramentos, grupamentos e bonificações); JCP líquido do IR retido na fonte pela alíquota da data de pagamento"
+      },
+      {
+        "value": "123.51675000",
+        "unit": "BRL/share",
+        "period": {
+          "type": "FY",
+          "start": "1998-01-01",
+          "end": "1998-12-31"
+        },
+        "basis": null,
+        "nature": "derived",
+        "source_ids": [
+          "b3-corporate_events-7f2a7e8aef3c"
+        ],
+        "confidence": "high",
+        "note": "ano 1998: soma de 2 proventos com data-com entre 1998-01-01 e 1998-12-31 (DIVIDENDO, JRS CAP PROPRIO), por ação atual (ajustados por desdobramentos, grupamentos e bonificações); JCP líquido do IR retido na fonte pela alíquota da data de pagamento"
+      },
+      {
+        "value": "168.21435000",
+        "unit": "BRL/share",
+        "period": {
+          "type": "FY",
+          "start": "1999-01-01",
+          "end": "1999-12-31"
+        },
+        "basis": null,
+        "nature": "derived",
+        "source_ids": [
+          "b3-corporate_events-7f2a7e8aef3c"
+        ],
+        "confidence": "high",
+        "note": "ano 1999: soma de 3 proventos com data-com entre 1999-01-01 e 1999-12-31 (JRS CAP PROPRIO, RENDIMENTO), por ação atual (ajustados por desdobramentos, grupamentos e bonificações); JCP líquido do IR retido na fonte pela alíquota da data de pagamento"
+      },
+      {
+        "value": "108.88450000",
+        "unit": "BRL/share",
+        "period": {
+          "type": "FY",
+          "start": "2000-01-01",
+          "end": "2000-12-31"
+        },
+        "basis": null,
+        "nature": "derived",
+        "source_ids": [
+          "b3-corporate_events-7f2a7e8aef3c"
+        ],
+        "confidence": "high",
+        "note": "ano 2000: soma de 4 proventos com data-com entre 2000-01-01 e 2000-12-31 (JRS CAP PROPRIO, RENDIMENTO), por ação atual (ajustados por desdobramentos, grupamentos e bonificações); JCP líquido do IR retido na fonte pela alíquota da data de pagamento"
+      },
+      {
+        "value": "154.51020000",
+        "unit": "BRL/share",
+        "period": {
+          "type": "FY",
+          "start": "2001-01-01",
+          "end": "2001-12-31"
+        },
+        "basis": null,
+        "nature": "derived",
+        "source_ids": [
+          "b3-corporate_events-7f2a7e8aef3c"
+        ],
+        "confidence": "high",
+        "note": "ano 2001: soma de 4 proventos com data-com entre 2001-01-01 e 2001-12-31 (DIVIDENDO, RENDIMENTO), por ação atual (ajustados por desdobramentos, grupamentos e bonificações); JCP líquido do IR retido na fonte pela alíquota da data de pagamento"
+      },
+      {
+        "value": "342.62768350",
+        "unit": "BRL/share",
+        "period": {
+          "type": "FY",
+          "start": "2002-01-01",
+          "end": "2002-12-31"
+        },
+        "basis": null,
+        "nature": "derived",
+        "source_ids": [
+          "b3-corporate_events-7f2a7e8aef3c"
+        ],
+        "confidence": "high",
+        "note": "ano 2002: soma de 4 proventos com data-com entre 2002-01-01 e 2002-12-31 (DIVIDENDO, RENDIMENTO), por ação atual (ajustados por desdobramentos, grupamentos e bonificações); JCP líquido do IR retido na fonte pela alíquota da data de pagamento"
+      },
+      {
+        "value": "384.13225000",
+        "unit": "BRL/share",
+        "period": {
+          "type": "FY",
+          "start": "2003-01-01",
+          "end": "2003-12-31"
+        },
+        "basis": null,
+        "nature": "derived",
+        "source_ids": [
+          "b3-corporate_events-255a6404dd55"
+        ],
+        "confidence": "high",
+        "note": "ano 2003: soma de 4 proventos com data-com entre 2003-01-01 e 2003-12-31 (DIVIDENDO, JRS CAP PROPRIO, RENDIMENTO), por ação atual (ajustados por desdobramentos, grupamentos e bonificações); JCP líquido do IR retido na fonte pela alíquota da data de pagamento"
+      },
+      {
+        "value": "0.66752250",
+        "unit": "BRL/share",
+        "period": {
+          "type": "FY",
+          "start": "2004-01-01",
+          "end": "2004-12-31"
+        },
+        "basis": null,
+        "nature": "derived",
+        "source_ids": [
+          "b3-corporate_events-255a6404dd55"
+        ],
+        "confidence": "high",
+        "note": "ano 2004: soma de 5 proventos com data-com entre 2004-01-01 e 2004-12-31 (JRS CAP PROPRIO, RENDIMENTO), por ação atual (ajustados por desdobramentos, grupamentos e bonificações); JCP líquido do IR retido na fonte pela alíquota da data de pagamento"
+      },
+      {
+        "value": "0.46596800",
+        "unit": "BRL/share",
+        "period": {
+          "type": "FY",
+          "start": "2005-01-01",
+          "end": "2005-12-31"
+        },
+        "basis": null,
+        "nature": "derived",
+        "source_ids": [
+          "b3-corporate_events-255a6404dd55"
+        ],
+        "confidence": "high",
+        "note": "ano 2005: soma de 4 proventos com data-com entre 2005-01-01 e 2005-12-31 (JRS CAP PROPRIO, RENDIMENTO), por ação atual (ajustados por desdobramentos, grupamentos e bonificações); JCP líquido do IR retido na fonte pela alíquota da data de pagamento"
+      },
+      {
+        "value": "2.21452913",
+        "unit": "BRL/share",
+        "period": {
+          "type": "FY",
+          "start": "2006-01-01",
+          "end": "2006-12-31"
+        },
+        "basis": null,
+        "nature": "derived",
+        "source_ids": [
+          "b3-corporate_events-255a6404dd55"
+        ],
+        "confidence": "high",
+        "note": "ano 2006: soma de 11 proventos com data-com entre 2006-01-01 e 2006-12-31 (DIVIDENDO, JRS CAP PROPRIO, RENDIMENTO), por ação atual (ajustados por desdobramentos, grupamentos e bonificações); JCP líquido do IR retido na fonte pela alíquota da data de pagamento"
+      },
+      {
+        "value": "0.66001846",
+        "unit": "BRL/share",
+        "period": {
+          "type": "FY",
+          "start": "2007-01-01",
+          "end": "2007-12-31"
+        },
+        "basis": null,
+        "nature": "derived",
+        "source_ids": [
+          "b3-corporate_events-255a6404dd55"
+        ],
+        "confidence": "high",
+        "note": "ano 2007: soma de 11 proventos com data-com entre 2007-01-01 e 2007-12-31 (DIVIDENDO, JRS CAP PROPRIO, RENDIMENTO), por ação atual (ajustados por desdobramentos, grupamentos e bonificações); JCP líquido do IR retido na fonte pela alíquota da data de pagamento"
+      },
+      {
+        "value": "0.52328380",
+        "unit": "BRL/share",
+        "period": {
+          "type": "FY",
+          "start": "2008-01-01",
+          "end": "2008-12-31"
+        },
+        "basis": null,
+        "nature": "derived",
+        "source_ids": [
+          "b3-corporate_events-255a6404dd55"
+        ],
+        "confidence": "high",
+        "note": "ano 2008: soma de 10 proventos com data-com entre 2008-01-01 e 2008-12-31 (DIVIDENDO, JRS CAP PROPRIO, RENDIMENTO), por ação atual (ajustados por desdobramentos, grupamentos e bonificações); JCP líquido do IR retido na fonte pela alíquota da data de pagamento"
+      },
+      {
+        "value": "0.65891359",
+        "unit": "BRL/share",
+        "period": {
+          "type": "FY",
+          "start": "2009-01-01",
+          "end": "2009-12-31"
+        },
+        "basis": null,
+        "nature": "derived",
+        "source_ids": [
+          "b3-corporate_events-255a6404dd55"
+        ],
+        "confidence": "high",
+        "note": "ano 2009: soma de 10 proventos com data-com entre 2009-01-01 e 2009-12-31 (DIVIDENDO, JRS CAP PROPRIO, RENDIMENTO), por ação atual (ajustados por desdobramentos, grupamentos e bonificações); JCP líquido do IR retido na fonte pela alíquota da data de pagamento"
+      },
+      {
+        "value": "0.86031722",
+        "unit": "BRL/share",
+        "period": {
+          "type": "FY",
+          "start": "2010-01-01",
+          "end": "2010-12-31"
+        },
+        "basis": null,
+        "nature": "derived",
+        "source_ids": [
+          "b3-corporate_events-255a6404dd55"
+        ],
+        "confidence": "high",
+        "note": "ano 2010: soma de 10 proventos com data-com entre 2010-01-01 e 2010-12-31 (DIVIDENDO, JRS CAP PROPRIO, RENDIMENTO), por ação atual (ajustados por desdobramentos, grupamentos e bonificações); JCP líquido do IR retido na fonte pela alíquota da data de pagamento"
+      },
+      {
+        "value": "0.86303340",
+        "unit": "BRL/share",
+        "period": {
+          "type": "FY",
+          "start": "2011-01-01",
+          "end": "2011-12-31"
+        },
+        "basis": null,
+        "nature": "derived",
+        "source_ids": [
+          "b3-corporate_events-255a6404dd55"
+        ],
+        "confidence": "high",
+        "note": "ano 2011: soma de 10 proventos com data-com entre 2011-01-01 e 2011-12-31 (DIVIDENDO, JRS CAP PROPRIO, RENDIMENTO), por ação atual (ajustados por desdobramentos, grupamentos e bonificações); JCP líquido do IR retido na fonte pela alíquota da data de pagamento"
+      },
+      {
+        "value": "0.72385591",
+        "unit": "BRL/share",
+        "period": {
+          "type": "FY",
+          "start": "2012-01-01",
+          "end": "2012-12-31"
+        },
+        "basis": null,
+        "nature": "derived",
+        "source_ids": [
+          "b3-corporate_events-255a6404dd55"
+        ],
+        "confidence": "high",
+        "note": "ano 2012: soma de 10 proventos com data-com entre 2012-01-01 e 2012-12-31 (DIVIDENDO, JRS CAP PROPRIO, RENDIMENTO), por ação atual (ajustados por desdobramentos, grupamentos e bonificações); JCP líquido do IR retido na fonte pela alíquota da data de pagamento"
+      },
+      {
+        "value": "1.10072232",
+        "unit": "BRL/share",
+        "period": {
+          "type": "FY",
+          "start": "2013-01-01",
+          "end": "2013-12-31"
+        },
+        "basis": null,
+        "nature": "derived",
+        "source_ids": [
+          "b3-corporate_events-255a6404dd55"
+        ],
+        "confidence": "high",
+        "note": "ano 2013: soma de 10 proventos com data-com entre 2013-01-01 e 2013-12-31 (DIVIDENDO, JRS CAP PROPRIO, RENDIMENTO), por ação atual (ajustados por desdobramentos, grupamentos e bonificações); JCP líquido do IR retido na fonte pela alíquota da data de pagamento"
+      },
+      {
+        "value": "0.73161429",
+        "unit": "BRL/share",
+        "period": {
+          "type": "FY",
+          "start": "2014-01-01",
+          "end": "2014-12-31"
+        },
+        "basis": null,
+        "nature": "derived",
+        "source_ids": [
+          "b3-corporate_events-255a6404dd55"
+        ],
+        "confidence": "high",
+        "note": "ano 2014: soma de 10 proventos com data-com entre 2014-01-01 e 2014-12-31 (DIVIDENDO, JRS CAP PROPRIO, RENDIMENTO), por ação atual (ajustados por desdobramentos, grupamentos e bonificações); JCP líquido do IR retido na fonte pela alíquota da data de pagamento"
+      },
+      {
+        "value": "0.91850832",
+        "unit": "BRL/share",
+        "period": {
+          "type": "FY",
+          "start": "2015-01-01",
+          "end": "2015-12-31"
+        },
+        "basis": null,
+        "nature": "derived",
+        "source_ids": [
+          "b3-corporate_events-255a6404dd55"
+        ],
+        "confidence": "high",
+        "note": "ano 2015: soma de 12 proventos com data-com entre 2015-01-01 e 2015-12-31 (DIVIDENDO, JRS CAP PROPRIO, RENDIMENTO), por ação atual (ajustados por desdobramentos, grupamentos e bonificações); JCP líquido do IR retido na fonte pela alíquota da data de pagamento"
+      },
+      {
+        "value": "0.38873587",
+        "unit": "BRL/share",
+        "period": {
+          "type": "FY",
+          "start": "2016-01-01",
+          "end": "2016-12-31"
+        },
+        "basis": null,
+        "nature": "derived",
+        "source_ids": [
+          "b3-corporate_events-255a6404dd55",
+          "b3-corporate_events-bc1b44d55229"
+        ],
+        "confidence": "high",
+        "note": "ano 2016: soma de 10 proventos com data-com entre 2016-01-01 e 2016-12-31 (JRS CAP PROPRIO, RENDIMENTO), por ação atual (ajustados por desdobramentos, grupamentos e bonificações); JCP líquido do IR retido na fonte pela alíquota da data de pagamento"
+      },
+      {
+        "value": "0.40232227",
+        "unit": "BRL/share",
+        "period": {
+          "type": "FY",
+          "start": "2017-01-01",
+          "end": "2017-12-31"
+        },
+        "basis": null,
+        "nature": "derived",
+        "source_ids": [
+          "b3-corporate_events-bc1b44d55229"
+        ],
+        "confidence": "high",
+        "note": "ano 2017: soma de 10 proventos com data-com entre 2017-01-01 e 2017-12-31 (JRS CAP PROPRIO, RENDIMENTO), por ação atual (ajustados por desdobramentos, grupamentos e bonificações); JCP líquido do IR retido na fonte pela alíquota da data de pagamento"
+      },
+      {
+        "value": "0.64486148",
+        "unit": "BRL/share",
+        "period": {
+          "type": "FY",
+          "start": "2018-01-01",
+          "end": "2018-12-31"
+        },
+        "basis": null,
+        "nature": "derived",
+        "source_ids": [
+          "b3-corporate_events-bc1b44d55229"
+        ],
+        "confidence": "high",
+        "note": "ano 2018: soma de 10 proventos com data-com entre 2018-01-01 e 2018-12-31 (JRS CAP PROPRIO, RENDIMENTO), por ação atual (ajustados por desdobramentos, grupamentos e bonificações); JCP líquido do IR retido na fonte pela alíquota da data de pagamento"
+      },
+      {
+        "value": "1.08639392",
+        "unit": "BRL/share",
+        "period": {
+          "type": "FY",
+          "start": "2019-01-01",
+          "end": "2019-12-31"
+        },
+        "basis": null,
+        "nature": "derived",
+        "source_ids": [
+          "b3-corporate_events-bc1b44d55229"
+        ],
+        "confidence": "high",
+        "note": "ano 2019: soma de 10 proventos com data-com entre 2019-01-01 e 2019-12-31 (JRS CAP PROPRIO, RENDIMENTO), por ação atual (ajustados por desdobramentos, grupamentos e bonificações); JCP líquido do IR retido na fonte pela alíquota da data de pagamento"
+      },
+      {
+        "value": "0.62813042",
+        "unit": "BRL/share",
+        "period": {
+          "type": "FY",
+          "start": "2020-01-01",
+          "end": "2020-12-31"
+        },
+        "basis": null,
+        "nature": "derived",
+        "source_ids": [
+          "b3-corporate_events-bc1b44d55229"
+        ],
+        "confidence": "high",
+        "note": "ano 2020: soma de 8 proventos com data-com entre 2020-01-01 e 2020-12-31 (JRS CAP PROPRIO, RENDIMENTO), por ação atual (ajustados por desdobramentos, grupamentos e bonificações); JCP líquido do IR retido na fonte pela alíquota da data de pagamento"
+      },
+      {
+        "value": "0.96904056",
+        "unit": "BRL/share",
+        "period": {
+          "type": "FY",
+          "start": "2021-01-01",
+          "end": "2021-12-31"
+        },
+        "basis": null,
+        "nature": "derived",
+        "source_ids": [
+          "b3-corporate_events-bc1b44d55229"
+        ],
+        "confidence": "high",
+        "note": "ano 2021: soma de 11 proventos com data-com entre 2021-01-01 e 2021-12-31 (DIVIDENDO, JRS CAP PROPRIO, RENDIMENTO), por ação atual (ajustados por desdobramentos, grupamentos e bonificações); JCP líquido do IR retido na fonte pela alíquota da data de pagamento"
+      },
+      {
+        "value": "1.84100012",
+        "unit": "BRL/share",
+        "period": {
+          "type": "FY",
+          "start": "2022-01-01",
+          "end": "2022-12-31"
+        },
+        "basis": null,
+        "nature": "derived",
+        "source_ids": [
+          "b3-corporate_events-bc1b44d55229"
+        ],
+        "confidence": "high",
+        "note": "ano 2022: soma de 16 proventos com data-com entre 2022-01-01 e 2022-12-31 (DIVIDENDO, JRS CAP PROPRIO, RENDIMENTO), por ação atual (ajustados por desdobramentos, grupamentos e bonificações); JCP líquido do IR retido na fonte pela alíquota da data de pagamento"
+      },
+      {
+        "value": "1.99250990",
+        "unit": "BRL/share",
+        "period": {
+          "type": "FY",
+          "start": "2023-01-01",
+          "end": "2023-12-31"
+        },
+        "basis": null,
+        "nature": "derived",
+        "source_ids": [
+          "b3-corporate_events-bc1b44d55229"
+        ],
+        "confidence": "high",
+        "note": "ano 2023: soma de 16 proventos com data-com entre 2023-01-01 e 2023-12-31 (DIVIDENDO, JRS CAP PROPRIO, RENDIMENTO), por ação atual (ajustados por desdobramentos, grupamentos e bonificações); JCP líquido do IR retido na fonte pela alíquota da data de pagamento"
+      },
+      {
+        "value": "2.28737975",
+        "unit": "BRL/share",
+        "period": {
+          "type": "FY",
+          "start": "2024-01-01",
+          "end": "2024-12-31"
+        },
+        "basis": null,
+        "nature": "derived",
+        "source_ids": [
+          "b3-corporate_events-bc1b44d55229"
+        ],
+        "confidence": "high",
+        "note": "ano 2024: soma de 15 proventos com data-com entre 2024-01-01 e 2024-12-31 (DIVIDENDO, JRS CAP PROPRIO, RENDIMENTO), por ação atual (ajustados por desdobramentos, grupamentos e bonificações); JCP líquido do IR retido na fonte pela alíquota da data de pagamento"
+      },
+      {
+        "value": "1.02772535",
+        "unit": "BRL/share",
+        "period": {
+          "type": "FY",
+          "start": "2025-01-01",
+          "end": "2025-12-31"
+        },
+        "basis": null,
+        "nature": "derived",
+        "source_ids": [
+          "b3-corporate_events-bc1b44d55229"
+        ],
+        "confidence": "high",
+        "note": "ano 2025: soma de 9 proventos com data-com entre 2025-01-01 e 2025-12-31 (DIVIDENDO, JRS CAP PROPRIO, RENDIMENTO), por ação atual (ajustados por desdobramentos, grupamentos e bonificações); JCP líquido do IR retido na fonte pela alíquota da data de pagamento"
+      }
+    ],
+    "net_income_annual": [
+      {
+        "value": "7027281000.0000",
+        "unit": "BRL",
+        "period": {
+          "type": "FY",
+          "start": "2016-01-01",
+          "end": "2016-12-31"
+        },
+        "basis": "consolidated",
+        "nature": "reported",
+        "source_ids": [
+          "cvm-dfp-2017-12-31-v2"
+        ],
+        "confidence": "high",
+        "note": null
+      },
+      {
+        "value": "10628794000.0000",
+        "unit": "BRL",
+        "period": {
+          "type": "FY",
+          "start": "2017-01-01",
+          "end": "2017-12-31"
+        },
+        "basis": "consolidated",
+        "nature": "reported",
+        "source_ids": [
+          "cvm-dfp-2018-12-31-v2"
+        ],
+        "confidence": "high",
+        "note": null
+      },
+      {
+        "value": "13825994000.0000",
+        "unit": "BRL",
+        "period": {
+          "type": "FY",
+          "start": "2018-01-01",
+          "end": "2018-12-31"
+        },
+        "basis": "consolidated",
+        "nature": "reported",
+        "source_ids": [
+          "cvm-dfp-2019-12-31-v2"
+        ],
+        "confidence": "high",
+        "note": null
+      },
+      {
+        "value": "16396896000.0000",
+        "unit": "BRL",
+        "period": {
+          "type": "FY",
+          "start": "2019-01-01",
+          "end": "2019-12-31"
+        },
+        "basis": "consolidated",
+        "nature": "reported",
+        "source_ids": [
+          "cvm-dfp-2020-12-31-v2"
+        ],
+        "confidence": "high",
+        "note": null
+      },
+      {
+        "value": "11851616000.0000",
+        "unit": "BRL",
+        "period": {
+          "type": "FY",
+          "start": "2020-01-01",
+          "end": "2020-12-31"
+        },
+        "basis": "consolidated",
+        "nature": "reported",
+        "source_ids": [
+          "cvm-dfp-2021-12-31-v2"
+        ],
+        "confidence": "high",
+        "note": null
+      },
+      {
+        "value": "18344326000.0000",
+        "unit": "BRL",
+        "period": {
+          "type": "FY",
+          "start": "2021-01-01",
+          "end": "2021-12-31"
+        },
+        "basis": "consolidated",
+        "nature": "reported",
+        "source_ids": [
+          "cvm-dfp-2022-12-31-v1"
+        ],
+        "confidence": "high",
+        "note": null
+      },
+      {
+        "value": "27731162000.0000",
+        "unit": "BRL",
+        "period": {
+          "type": "FY",
+          "start": "2022-01-01",
+          "end": "2022-12-31"
+        },
+        "basis": "consolidated",
+        "nature": "reported",
+        "source_ids": [
+          "cvm-dfp-2023-12-31-v1"
+        ],
+        "confidence": "high",
+        "note": null
+      },
+      {
+        "value": "29860965000.0000",
+        "unit": "BRL",
+        "period": {
+          "type": "FY",
+          "start": "2023-01-01",
+          "end": "2023-12-31"
+        },
+        "basis": "consolidated",
+        "nature": "reported",
+        "source_ids": [
+          "cvm-dfp-2024-12-31-v1"
+        ],
+        "confidence": "high",
+        "note": null
+      },
+      {
+        "value": "26358860000.0000",
+        "unit": "BRL",
+        "period": {
+          "type": "FY",
+          "start": "2024-01-01",
+          "end": "2024-12-31"
+        },
+        "basis": "consolidated",
+        "nature": "reported",
+        "source_ids": [
+          "cvm-dfp-2025-12-31-v1"
+        ],
+        "confidence": "high",
+        "note": null
+      },
+      {
+        "value": "13698124000.0000",
+        "unit": "BRL",
+        "period": {
+          "type": "FY",
+          "start": "2025-01-01",
+          "end": "2025-12-31"
+        },
+        "basis": "consolidated",
+        "nature": "reported",
+        "source_ids": [
+          "cvm-dfp-2025-12-31-v1"
+        ],
+        "confidence": "high",
+        "note": null
+      }
+    ]
+  },
+  "unavailable": {}
+}

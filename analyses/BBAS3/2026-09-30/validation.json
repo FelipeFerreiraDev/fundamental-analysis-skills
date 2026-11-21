@@ -1,9 +1,9 @@
 {
-  "schema_version": "0.2.0",
+  "schema_version": "0.3.0",
   "ticker": "BBAS3",
   "reference_date": "2026-09-30",
-  "snapshot_as_of": "2026-11-21T14:06:46",
-  "generated_at": "2026-11-21T14:06:47",
+  "snapshot_as_of": "2026-11-21T15:39:37",
+  "generated_at": "2026-11-21T15:39:38",
   "engine_version": "0.1.0",
   "checks": [
     {

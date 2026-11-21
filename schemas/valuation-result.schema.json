@@ -53,6 +53,42 @@
       "title": "Assumption",
       "type": "object"
     },
+    "CeilingPrice": {
+      "additionalProperties": false,
+      "properties": {
+        "margin_of_safety": {
+          "anyOf": [
+            {
+              "exclusiveMaximum": 1.0,
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "type": "string"
+            }
+          ],
+          "title": "Margin Of Safety"
+        },
+        "price": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "string"
+            }
+          ],
+          "description": "fair_value x (1 - margin_of_safety)",
+          "title": "Price"
+        }
+      },
+      "required": [
+        "margin_of_safety",
+        "price"
+      ],
+      "title": "CeilingPrice",
+      "type": "object"
+    },
     "FinancialValue": {
       "additionalProperties": false,
       "description": "A single number with everything needed to trace and audit it.",
@@ -230,26 +266,16 @@
             }
           ],
           "default": null,
-          "description": "Maximum purchase price (Bazin: the method's own result).",
+          "description": "Maximum purchase price given directly by the method (e.g. Bazin).",
           "title": "Ceiling Price"
         },
-        "required_margin_of_safety": {
-          "anyOf": [
-            {
-              "exclusiveMaximum": 1.0,
-              "minimum": 0.0,
-              "type": "number"
-            },
-            {
-              "type": "string"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "default": null,
-          "description": "Margin applied to fair_value to derive ceiling_price, when applicable.",
-          "title": "Required Margin Of Safety"
+        "ceiling_prices": {
+          "description": "Ceiling price for each configured margin of safety (fair-value methods).",
+          "items": {
+            "$ref": "#/$defs/CeilingPrice"
+          },
+          "title": "Ceiling Prices",
+          "type": "array"
         },
         "margin_of_safety_at_price": {
           "anyOf": [
@@ -266,6 +292,22 @@
           "default": null,
           "description": "(fair_value - price) / fair_value at the snapshot price.",
           "title": "Margin Of Safety At Price"
+        },
+        "price": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Price the result was compared to.",
+          "title": "Price"
         }
       },
       "title": "ValuationOutput",
@@ -275,8 +317,8 @@
   "additionalProperties": false,
   "properties": {
     "schema_version": {
-      "const": "0.2.0",
-      "default": "0.2.0",
+      "const": "0.3.0",
+      "default": "0.3.0",
       "title": "Schema Version",
       "type": "string"
     },

@@ -19,7 +19,7 @@ class Check(ContractModel):
 
 
 class ValidationReport(ContractModel):
-    schema_version: Literal["0.2.0"] = SCHEMA_VERSION
+    schema_version: Literal["0.3.0"] = SCHEMA_VERSION
     ticker: str = Field(pattern=TICKER)
     reference_date: date
     snapshot_as_of: datetime

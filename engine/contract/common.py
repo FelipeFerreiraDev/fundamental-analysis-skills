@@ -8,7 +8,7 @@ from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
-SCHEMA_VERSION = "0.2.0"
+SCHEMA_VERSION = "0.3.0"
 
 PeriodType = Literal["INSTANT", "3M", "YTD", "FY", "LTM"]
 Unit = Literal["BRL", "BRL/share", "shares", "ratio", "count"]

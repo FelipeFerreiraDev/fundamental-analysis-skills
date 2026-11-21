@@ -1,0 +1,86 @@
+{
+  "schema_version": "0.3.0",
+  "method": "bazin_net",
+  "ticker": "BBAS3",
+  "reference_date": "2026-09-30",
+  "applicable": true,
+  "not_applicable_reason": null,
+  "formula": "média anual de proventos por ação ÷ dividend yield desejado",
+  "inputs": {
+    "average_dividends_per_share": {
+      "value": "1.57283297",
+      "unit": "BRL/share",
+      "period": {
+        "type": "INSTANT",
+        "start": null,
+        "end": "2026-11-21"
+      },
+      "basis": null,
+      "nature": "derived",
+      "source_ids": [
+        "b3-corporate_events-bc1b44d55229"
+      ],
+      "confidence": "high",
+      "note": "soma de 66 proventos com data-com entre 2021-11-22 e 2026-11-21 (7.86416485 por ação atual) ÷ 5 anos; JCP líquido do IR retido na fonte"
+    },
+    "price": {
+      "value": "14.3000",
+      "unit": "BRL/share",
+      "period": {
+        "type": "INSTANT",
+        "start": null,
+        "end": "2026-11-20"
+      },
+      "basis": null,
+      "nature": "reported",
+      "source_ids": [
+        "brapi-quote-7a6915163547"
+      ],
+      "confidence": "high",
+      "note": null
+    }
+  },
+  "assumptions": [
+    {
+      "name": "target_dividend_yield",
+      "value": "0.06",
+      "unit": "ratio",
+      "justification": "Rendimento mínimo de 6% ao ano proposto por Bazin; configurável."
+    },
+    {
+      "name": "lookback_years",
+      "value": "5",
+      "unit": "count",
+      "justification": "Janela móvel definida pelo investidor em config/defaults.yaml."
+    },
+    {
+      "name": "include_jcp_correction",
+      "value": "sim",
+      "unit": null,
+      "justification": "Inclui os 'RENDIMENTOS' (correção do JCP entre data-com e pagamento), por decisão do investidor."
+    },
+    {
+      "name": "jcp_withholding_rates",
+      "value": "0.15 desde 1996-01-01; 0.175 desde 2026-01-01",
+      "unit": "ratio",
+      "justification": "Alíquotas de IR retido sobre JCP pela data de pagamento (config/defaults.yaml): 15% (Lei 9.249/1995) e 17,5% desde 2026 (LC 224/2025)."
+    }
+  ],
+  "result": {
+    "unit": "BRL/share",
+    "fair_value": null,
+    "ceiling_price": "26.2139",
+    "ceiling_prices": [],
+    "margin_of_safety_at_price": null,
+    "price": "14.3000"
+  },
+  "limitations": [
+    "Pressupõe que os proventos da janela se repetirão; não avalia lucro, crescimento nem a capacidade de manter o payout.",
+    "Proventos extraordinários entram na média e podem inflar o preço-teto.",
+    "Os proventos dos últimos 12 meses equivalem a 36.5% da média anual da janela.",
+    "Considera só o IR retido na fonte sobre JCP; outras tributações do investidor não são consideradas."
+  ],
+  "applicability_rationale": "Histórico de proventos desde 1997-09-29, cobrindo a janela.",
+  "engine_version": "0.1.0",
+  "computed_at": "2026-11-21T15:39:38"
+}

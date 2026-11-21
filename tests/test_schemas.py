@@ -13,4 +13,4 @@ def test_schemas_are_valid_json_with_dialect():
     for content in render_schemas().values():
         schema = json.loads(content)
         assert schema["$schema"].startswith("https://json-schema.org/")
-        assert schema["properties"]["schema_version"]["const"] == "0.2.0"
+        assert schema["properties"]["schema_version"]["const"] == "0.3.0"

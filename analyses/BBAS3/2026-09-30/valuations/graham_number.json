@@ -1,0 +1,108 @@
+{
+  "schema_version": "0.3.0",
+  "method": "graham_number",
+  "ticker": "BBAS3",
+  "reference_date": "2026-09-30",
+  "applicable": true,
+  "not_applicable_reason": null,
+  "formula": "√(22,5 × LPA × VPA)",
+  "inputs": {
+    "eps": {
+      "value": "1.92965211",
+      "unit": "BRL/share",
+      "period": {
+        "type": "LTM",
+        "start": "2025-10-01",
+        "end": "2026-09-30"
+      },
+      "basis": null,
+      "nature": "derived",
+      "source_ids": [
+        "cvm-dfp-2025-12-31-v1",
+        "cvm-itr-2026-09-30-v1"
+      ],
+      "confidence": "high",
+      "note": "lucro líquido do controlador nos últimos 12 meses ÷ ações em circulação na data-base (o LPA reportado usa a média ponderada de ações)"
+    },
+    "bvps": {
+      "value": "32.60570302",
+      "unit": "BRL/share",
+      "period": {
+        "type": "INSTANT",
+        "start": null,
+        "end": "2026-09-30"
+      },
+      "basis": null,
+      "nature": "derived",
+      "source_ids": [
+        "cvm-itr-2026-09-30-v1"
+      ],
+      "confidence": "high",
+      "note": "patrimônio do controlador ÷ ações em circulação na data-base"
+    },
+    "price": {
+      "value": "14.3000",
+      "unit": "BRL/share",
+      "period": {
+        "type": "INSTANT",
+        "start": null,
+        "end": "2026-11-20"
+      },
+      "basis": null,
+      "nature": "reported",
+      "source_ids": [
+        "brapi-quote-7a6915163547"
+      ],
+      "confidence": "high",
+      "note": null
+    }
+  },
+  "assumptions": [
+    {
+      "name": "graham_constant",
+      "value": "22.5",
+      "unit": null,
+      "justification": "P/L máximo de 15 × P/VP máximo de 1,5 (Graham, The Intelligent Investor, critérios para o investidor defensivo)."
+    },
+    {
+      "name": "margins_of_safety",
+      "value": "0.15, 0.25, 0.3, 0.35",
+      "unit": "ratio",
+      "justification": "Margens definidas pelo investidor em config/defaults.yaml."
+    }
+  ],
+  "result": {
+    "unit": "BRL/share",
+    "fair_value": "37.6251",
+    "ceiling_price": null,
+    "ceiling_prices": [
+      {
+        "margin_of_safety": "0.15",
+        "price": "31.9813"
+      },
+      {
+        "margin_of_safety": "0.25",
+        "price": "28.2188"
+      },
+      {
+        "margin_of_safety": "0.3",
+        "price": "26.3376"
+      },
+      {
+        "margin_of_safety": "0.35",
+        "price": "24.4563"
+      }
+    ],
+    "margin_of_safety_at_price": "0.6199",
+    "price": "14.3000"
+  },
+  "limitations": [
+    "Não considera crescimento, qualidade do lucro nem vantagens competitivas.",
+    "Usa o lucro dos últimos 12 meses: um período atípico (provisões, ganhos não recorrentes) distorce o resultado.",
+    "O LPA usa as ações em circulação na data-base, não a média ponderada do período.",
+    "Graham formulou o critério para empresas não financeiras. Em bancos o patrimônio é alavancado e regulado: leia o resultado junto com ROE, Basileia e qualidade da carteira."
+  ],
+  "applicability_rationale": "O Número de Graham exige lucro e patrimônio positivos; usa o LPA dos últimos 12 meses e o VPA da data-base. Ambos são positivos na data-base.",
+  "engine_version": "0.1.0",
+  "computed_at": "2026-11-21T15:39:38"
+}

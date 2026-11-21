@@ -25,6 +25,11 @@ class Assumption(ContractModel):
     justification: str = Field(min_length=1)
 
 
+class CeilingPrice(ContractModel):
+    margin_of_safety: Decimal = Field(ge=0, lt=1)
+    price: Decimal = Field(description="fair_value x (1 - margin_of_safety)")
+
+
 class ValuationOutput(ContractModel):
     """Per-share results. Margins are fractions (0.25 means 25%)."""
 
@@ -33,27 +38,32 @@ class ValuationOutput(ContractModel):
         default=None, description="Intrinsic value estimated by the method."
     )
     ceiling_price: Decimal | None = Field(
-        default=None, description="Maximum purchase price (Bazin: the method's own result)."
-    )
-    required_margin_of_safety: Decimal | None = Field(
         default=None,
-        ge=0,
-        lt=1,
-        description="Margin applied to fair_value to derive ceiling_price, when applicable.",
+        description="Maximum purchase price given directly by the method (e.g. Bazin).",
+    )
+    ceiling_prices: list[CeilingPrice] = Field(
+        default_factory=list,
+        description="Ceiling price for each configured margin of safety (fair-value methods).",
     )
     margin_of_safety_at_price: Decimal | None = Field(
         default=None, description="(fair_value - price) / fair_value at the snapshot price."
     )
+    price: Decimal | None = Field(default=None, description="Price the result was compared to.")
 
     @model_validator(mode="after")
     def _check_has_result(self) -> ValuationOutput:
         if self.fair_value is None and self.ceiling_price is None:
             raise ValueError("a valuation result needs a fair_value or a ceiling_price")
+        if self.ceiling_prices and self.fair_value is None:
+            raise ValueError("ceiling_prices are derived from fair_value")
+        margins = [c.margin_of_safety for c in self.ceiling_prices]
+        if margins != sorted(set(margins)):
+            raise ValueError("ceiling_prices must have distinct margins in ascending order")
         return self
 
 
 class ValuationResult(ContractModel):
-    schema_version: Literal["0.2.0"] = SCHEMA_VERSION
+    schema_version: Literal["0.3.0"] = SCHEMA_VERSION
     method: str = Field(pattern=SNAKE_CASE, description="e.g. graham_number, bazin")
     ticker: str = Field(pattern=TICKER)
     reference_date: date

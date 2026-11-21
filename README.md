@@ -20,9 +20,22 @@ O skillsInvest é um conjunto de analistas especializados (skills do Claude Code
   - ✅ sync dos dados da CVM (cadastro, FCA, DFP e ITR) e mapa de contas de bancos
   - ✅ sync de cotações e proventos (B3), cotação do dia (brapi) e Selic/IPCA (Banco Central)
   - ✅ snapshot da análise (`data.json`) e validação dos dados (`validation.json`)
-  - ⏭️ indicadores, Graham, Bazin, relatório e as primeiras skills
+  - ✅ indicadores, Graham e Bazin, e as primeiras skills
+  - ⏭️ relatório HTML
 
-As skills ainda não foram escritas. Hoje é possível carregar no banco local os balanços, cotações e proventos de uma empresa e consultar as séries históricas. O roadmap completo está em [docs/architecture.md](docs/architecture.md#10-roadmap).
+## Skills
+
+Ficam em [.claude/skills/](.claude/skills/) e são usadas pelo Claude Code dentro deste repositório. Peça, por exemplo, "avalia o BBAS3 pelo Graham e pelo Bazin".
+
+| Skill | O que faz |
+|---|---|
+| `data-extractor` | Roda o `sync` e o `snapshot` da empresa |
+| `data-validator` | Roda o `validate` e explica erros e avisos |
+| `indicators` | Calcula e explica LPA, VPA, ROE, P/L, P/VP, proventos e dividend yield |
+| `valuation-graham` | Número de Graham com preço-teto por margem de segurança |
+| `valuation-bazin` | Preço-teto de Bazin com JCP bruto e líquido |
+
+As skills nunca fazem contas: chamam o engine e interpretam os JSONs gerados. O roadmap completo está em [docs/architecture.md](docs/architecture.md#10-roadmap).
 
 ## Pré-requisitos
 
@@ -88,7 +101,8 @@ Os parâmetros do investidor ficam em [config/defaults.yaml](config/defaults.yam
 
 - Percentuais são escritos como fração: `0.06` = 6%.
 - Um valor `null` ainda não foi definido, e o engine recusa calcular um método que dependa dele.
-- Hoje está definido o dividend yield desejado do Bazin (`0.06`).
+- `valuation.margins_of_safety`: margens para transformar valor justo em preço-teto (hoje 15%, 25%, 30% e 35%; um preço-teto por margem).
+- `bazin`: DY desejado (6%), janela de 5 anos, inclusão dos rendimentos de JCP e as alíquotas de IR retido sobre JCP por data de pagamento (15%; 17,5% desde 2026), usadas na variante líquida.
 - `sync.history_years` (padrão 10) e `sync.quarterly_years` (padrão 2) definem quantos anos de DFP e de ITR o `sync` carrega. Cada documento traz também o ano anterior como comparação.
 
 ### Setor da empresa
@@ -106,6 +120,8 @@ Com o ambiente ativado (`source .venv/bin/activate`):
 | `skillsinvest sync <TICKER>` | Carrega no banco os dados da empresa: cadastro, ações, DFP e ITR (CVM); cotações diárias e proventos (B3); cotação do dia (brapi); Selic e IPCA (Banco Central). Rodar de novo só baixa o que mudou |
 | `skillsinvest snapshot <TICKER>` | Gera `analyses/<TICKER>/<data-base>/data.json` com tudo o que as análises usam, cada valor com sua fonte |
 | `skillsinvest validate <TICKER>` | Confere o último `data.json` e grava `validation.json`. Termina com código 1 se algum erro bloquear os valuations. `-v` mostra todos os detalhes |
+| `skillsinvest indicators <TICKER>` | Calcula os indicadores do último snapshot validado e grava `indicators.json` |
+| `skillsinvest valuate <TICKER>` | Roda Graham e Bazin e grava `valuations/<método>.json`. `--method graham\|bazin\|all` |
 | `skillsinvest series <TICKER> <conceito>` | Mostra a série histórica de um conceito, com o documento de origem de cada valor. Opções: `--period INSTANT\|3M\|YTD\|FY` e `--basis consolidated\|individual` |
 | `skillsinvest export-schemas` | Regenera os JSON Schemas em `schemas/` a partir de `engine/contract/` |
 | `skillsinvest export-schemas --check` | Só verifica se `schemas/` está em dia (termina com código 1 se não estiver) |
@@ -120,7 +136,11 @@ skillsinvest sync BBAS3                          # ~2 a 5 minutos na primeira ve
 skillsinvest series BBAS3 net_income --period FY
 skillsinvest snapshot BBAS3                      # analyses/BBAS3/2026-09-30/data.json
 skillsinvest validate BBAS3                      # analyses/BBAS3/2026-09-30/validation.json
+skillsinvest indicators BBAS3                    # analyses/BBAS3/2026-09-30/indicators.json
+skillsinvest valuate BBAS3                       # analyses/BBAS3/2026-09-30/valuations/*.json
 ```
+
+Cada etapa recusa rodar se a anterior estiver faltando, for de outro snapshot ou se a validação tiver erros.
 
 Os conceitos disponíveis estão em [engine/reference/account_map.csv](engine/reference/account_map.csv). Por enquanto há mapa de contas só para bancos.
 
@@ -166,6 +186,7 @@ As regras completas de trabalho estão no [CLAUDE.md](CLAUDE.md).
 
 ```
 ├── CLAUDE.md               # princípios e regras de trabalho (lido pelo Claude Code)
+├── .claude/skills/         # skills (data-extractor, data-validator, indicators, valuation-*)
 ├── docs/architecture.md    # arquitetura e decisões
 ├── config/                 # parâmetros de análise e overrides de setor
 ├── schemas/                # JSON Schemas do contrato (gerados)
@@ -177,13 +198,15 @@ As regras completas de trabalho estão no [CLAUDE.md](CLAUDE.md).
 │   ├── reference/          # mapa de contas e mapa de setores da CVM
 │   ├── snapshot/           # banco → data.json
 │   ├── validation/         # checagens → validation.json
+│   ├── indicators/         # indicadores → indicators.json
+│   ├── valuation/          # Graham e Bazin → valuations/*.json
 │   └── ...                 # validação, indicadores, valuation, setores, relatório (próximas etapas)
 ├── analyses/               # saídas das análises (versionadas): data.json, validation.json...
 ├── tests/                  # testes e fixtures (BBAS3)
 └── data/                   # dados locais, fora do git
 ```
 
-A pasta `.claude/skills/` (skills) surge nos próximos passos da fase 1.
+As skills ficam em `.claude/skills/<nome>/SKILL.md`, com a metodologia em `references/`.
 
 ## Documentação
 

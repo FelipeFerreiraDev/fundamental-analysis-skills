@@ -1,0 +1,79 @@
+{
+  "schema_version": "0.3.0",
+  "method": "bazin_gross",
+  "ticker": "BBAS3",
+  "reference_date": "2026-09-30",
+  "applicable": true,
+  "not_applicable_reason": null,
+  "formula": "média anual de proventos por ação ÷ dividend yield desejado",
+  "inputs": {
+    "average_dividends_per_share": {
+      "value": "1.80516157",
+      "unit": "BRL/share",
+      "period": {
+        "type": "INSTANT",
+        "start": null,
+        "end": "2026-11-21"
+      },
+      "basis": null,
+      "nature": "derived",
+      "source_ids": [
+        "b3-corporate_events-bc1b44d55229"
+      ],
+      "confidence": "high",
+      "note": "soma de 66 proventos com data-com entre 2021-11-22 e 2026-11-21 (9.02580784 por ação atual) ÷ 5 anos; JCP bruto"
+    },
+    "price": {
+      "value": "14.3000",
+      "unit": "BRL/share",
+      "period": {
+        "type": "INSTANT",
+        "start": null,
+        "end": "2026-11-20"
+      },
+      "basis": null,
+      "nature": "reported",
+      "source_ids": [
+        "brapi-quote-7a6915163547"
+      ],
+      "confidence": "high",
+      "note": null
+    }
+  },
+  "assumptions": [
+    {
+      "name": "target_dividend_yield",
+      "value": "0.06",
+      "unit": "ratio",
+      "justification": "Rendimento mínimo de 6% ao ano proposto por Bazin; configurável."
+    },
+    {
+      "name": "lookback_years",
+      "value": "5",
+      "unit": "count",
+      "justification": "Janela móvel definida pelo investidor em config/defaults.yaml."
+    },
+    {
+      "name": "include_jcp_correction",
+      "value": "sim",
+      "unit": null,
+      "justification": "Inclui os 'RENDIMENTOS' (correção do JCP entre data-com e pagamento), por decisão do investidor."
+    }
+  ],
+  "result": {
+    "unit": "BRL/share",
+    "fair_value": null,
+    "ceiling_price": "30.0860",
+    "ceiling_prices": [],
+    "margin_of_safety_at_price": null,
+    "price": "14.3000"
+  },
+  "limitations": [
+    "Pressupõe que os proventos da janela se repetirão; não avalia lucro, crescimento nem a capacidade de manter o payout.",
+    "Proventos extraordinários entram na média e podem inflar o preço-teto.",
+    "Os proventos dos últimos 12 meses equivalem a 38.2% da média anual da janela."
+  ],
+  "applicability_rationale": "Histórico de proventos desde 1997-09-29, cobrindo a janela.",
+  "engine_version": "0.1.0",
+  "computed_at": "2026-11-21T15:39:38"
+}

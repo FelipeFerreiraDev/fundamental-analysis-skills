@@ -1,5 +1,5 @@
 {
-  "schema_version": "0.2.0",
+  "schema_version": "0.3.0",
   "company": {
     "name": "BANCO DO BRASIL S.A.",
     "cnpj": "00000000000191",
@@ -14,7 +14,7 @@
     ]
   },
   "reference_date": "2026-09-30",
-  "as_of": "2026-11-21T14:06:46",
+  "as_of": "2026-11-21T15:39:37",
   "ingestion_run_ids": [
     "42d5692c-124a-4226-96a3-3e95d77364bd",
     "6ad92de8-69bd-4de9-8d9c-12332e725ad1",

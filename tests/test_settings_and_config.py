@@ -37,7 +37,23 @@ def test_data_dir_can_be_overridden(monkeypatch, tmp_path):
 def test_defaults_file_loads_with_exact_decimals():
     config = load_config()
     assert config.bazin.target_dividend_yield == Decimal("0.06")
-    assert config.valuation.margin_of_safety is None
+    assert config.valuation.margins_of_safety == [
+        Decimal("0.15"),
+        Decimal("0.25"),
+        Decimal("0.30"),
+        Decimal("0.35"),
+    ]
+    assert config.bazin.lookback_years == 5
+
+
+def test_jcp_withholding_rate_by_payment_date():
+    from datetime import date
+
+    bazin = load_config().bazin
+    assert bazin.jcp_rate_on(date(2025, 12, 31)) == Decimal("0.15")
+    assert bazin.jcp_rate_on(date(2026, 1, 1)) == Decimal("0.175")
+    with pytest.raises(ValueError):
+        bazin.jcp_rate_on(date(1990, 1, 1))
 
 
 def test_env_example_urls_match_settings_defaults():

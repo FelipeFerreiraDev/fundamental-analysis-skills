@@ -244,21 +244,25 @@ Formato comum de resultado de valuation:
 
 ```json
 {
-  "schema_version": "0.1.0",
+  "schema_version": "0.3.0",
   "method": "graham_number",
   "ticker": "BBAS3",
   "reference_date": "2026-09-30",
   "applicable": true,
   "not_applicable_reason": null,
-  "formula": "sqrt(22.5 * eps * bvps)",
+  "formula": "√(22,5 × LPA × VPA)",
   "inputs": { "eps": { "...": "value object" }, "bvps": { "...": "value object" } },
   "assumptions": [{ "name": "...", "value": 0, "justification": "..." }],
   "result": {
     "unit": "BRL/share",
     "fair_value": "0",
-    "ceiling_price": "0",
-    "required_margin_of_safety": "0",
-    "margin_of_safety_at_price": "0"
+    "ceiling_price": null,
+    "ceiling_prices": [
+      { "margin_of_safety": "0.15", "price": "0" },
+      { "margin_of_safety": "0.25", "price": "0" }
+    ],
+    "margin_of_safety_at_price": "0",
+    "price": "0"
   },
   "limitations": ["..."],
   "applicability_rationale": "...",
@@ -268,8 +272,9 @@ Formato comum de resultado de valuation:
 ```
 
 - `fair_value`: valor intrínseco estimado pelo método.
-- `ceiling_price`: preço máximo de compra. No Bazin é o próprio resultado do método. Nos demais, `fair_value × (1 − required_margin_of_safety)`.
-- `required_margin_of_safety`: margem exigida (de `config/defaults.yaml`) usada para derivar o preço-teto.
+- `ceiling_price`: preço-teto dado diretamente pelo método (Bazin).
+- `ceiling_prices`: nos métodos de valor justo, um preço-teto por margem de segurança configurada (`valuation.margins_of_safety`, hoje 15%, 25%, 30% e 35%): `fair_value × (1 − margem)`.
+- `price`: o preço com que o resultado foi comparado.
 - `margin_of_safety_at_price`: `(fair_value − preço) / fair_value` na cotação do snapshot.
 - Método aplicável exige `formula`, `inputs` e `result`. Método não aplicável exige `not_applicable_reason` e não pode ter `result`.
 - Resultados qualitativos (Fisher, research) têm pontuação, critérios, evidências e fontes, sem campos de preço.
@@ -360,7 +365,8 @@ Detalhes completos irão para o `references/` de cada skill.
 
 - **Validador:** no ITR, a DRE tem trimestre e acumulado; a DFC é só acumulada; o 4T isolado não é publicado. Valor de mercado = soma de (ações da classe × preço da classe), sem tesouraria.
 - **Bancos:** "lucro recorrente" e inadimplência têm definições diferentes em cada banco — normalizar antes de comparar. A Resolução CMN 4.966 (vigente desde 2025) mudou a provisão para perda esperada, o que quebra a série histórica e deve ser sinalizado.
-- **Bazin:** definir explicitamente dividendos + JCP, bruto ou líquido, critério data-com e janela de anos.
+- **Bazin:** dividendos + JCP + rendimentos de JCP, por data-com, ajustados por desdobramentos, numa janela móvel de 5 anos; duas variantes, JCP bruto e líquido do IR retido (15%; 17,5% desde 2026). Detalhes em `.claude/skills/valuation-bazin/references/methodology.md`.
+- **Graham:** Número de Graham com o LPA dos últimos 12 meses e o VPA da data-base; a fórmula revisada de 1974 entra com a premissa de crescimento (fase 2). Detalhes em `.claude/skills/valuation-graham/references/methodology.md`.
 - **DCF:** fluxo e taxa sempre na mesma base (real ou nominal).
 
 ## 10. Roadmap
@@ -391,6 +397,7 @@ Primeira empresa: **BBAS3**. Um banco testa logo o caso mais difícil do contrat
 - [ ] Mapa de contas para `non_financial` e `insurance` (com a primeira empresa de cada tipo).
 - [x] Fonte gratuita de **histórico de proventos por ação**: API das páginas de empresas listadas da B3 (a brapi cobra por esse dado). JCP vem bruto; "RENDIMENTO" (correção do JCP entre a data-com e o pagamento) fica como `other`. Proventos extraordinários ainda precisam ser identificados na validação.
 - [x] Confirmar a periodicidade de atualização do conjunto DFP na CVM (semanal, junto com o ITR).
-- [ ] Definir valores padrão de `config/defaults.yaml` além do DY de 6% (margem de segurança, janela do Bazin, Ke).
+- [x] Margens de segurança (15%, 25%, 30%, 35%), janela do Bazin (5 anos), JCP bruto e líquido e inclusão dos rendimentos de JCP.
+- [ ] Custo do capital próprio (Ke), necessário para DDM, residual income e P/VP justo (fase 2).
 - [ ] **README inicial (fase 0):** instalação, configuração do `.env`, `data/` (banco, cache e PDFs) fora do git e como reconstruir com `sync`. Depois disso, atualizado a cada mudança de execução.
 - [ ] Aviso no relatório de que a análise não constitui recomendação de investimento.

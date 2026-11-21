@@ -4,12 +4,21 @@
 # O engine recusa calcular um método que dependa de um valor null.
 
 valuation:
-  margin_of_safety: null   # margem exigida para derivar o preço-teto a partir do valor justo
+  # Margens exigidas para transformar valor justo em preço-teto: um preço-teto por margem.
+  margins_of_safety: [0.15, 0.25, 0.30, 0.35]
   cost_of_equity: null     # Ke — custo do capital próprio
 
 bazin:
   target_dividend_yield: 0.06
-  lookback_years: null     # janela de anos para a média de proventos
+  lookback_years: 5          # janela móvel (meses até o snapshot) para a média de proventos
+  include_jcp_correction: true   # "RENDIMENTO": correção do JCP entre data-com e pagamento
+  # IR retido na fonte sobre JCP, pela data de pagamento (data-com quando ela falta).
+  # Usado na variante líquida do Bazin. Confira a legislação antes de alterar.
+  jcp_withholding_rates:
+    - since: 1996-01-01
+      rate: 0.15             # Lei 9.249/1995, art. 9º
+    - since: 2026-01-01
+      rate: 0.175            # Lei Complementar 224/2025
 
 sync:
   history_years: 10        # anos de DFP carregados (cada DFP traz também o ano anterior)

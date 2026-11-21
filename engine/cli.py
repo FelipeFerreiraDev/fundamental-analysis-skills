@@ -11,16 +11,19 @@ from decimal import Decimal
 
 from engine import __version__
 from engine.config import DEFAULTS_PATH, load_config, load_sector_overrides
-from engine.contract import AnalysisData
 from engine.contract.export import SCHEMAS_DIR, export_schemas, outdated_schemas
 from engine.db import connect, init_database, pending_migrations
 from engine.db.reference import read_cvm_sector_map
+from engine.indicators.core import compute_indicators
 from engine.ingest.http import HttpFetcher, purge_expired_cache
 from engine.ingest.market_sync import sync_macro, sync_market
 from engine.ingest.sync import TickerNotFoundError, sync_company
 from engine.settings import EXTERNAL_URL_FIELDS, PROJECT_ROOT, env_file_path, get_settings
-from engine.snapshot.build import ANALYSES_DIR, SnapshotError, build_snapshot, write_snapshot
+from engine.snapshot.build import SnapshotError, build_snapshot, write_snapshot
+from engine.snapshot.folder import AnalysisFolder, AnalysisStateError
 from engine.validation.checks import run_validation
+from engine.valuation.bazin import value_bazin
+from engine.valuation.graham import value_graham
 
 
 def _cmd_sync(args: argparse.Namespace) -> int:
@@ -112,22 +115,15 @@ def _cmd_snapshot(args: argparse.Namespace) -> int:
     return 0
 
 
-def latest_analysis_dir(ticker: str):
-    folder = ANALYSES_DIR / ticker.upper()
-    candidates = sorted(p for p in folder.glob("*") if (p / "data.json").exists())
-    return candidates[-1] if candidates else None
-
-
 def _cmd_validate(args: argparse.Namespace) -> int:
-    folder = latest_analysis_dir(args.ticker)
-    if folder is None:
-        print(f"erro: nenhum snapshot de {args.ticker.upper()} — rode: skillsinvest snapshot")
+    try:
+        folder = AnalysisFolder.latest(args.ticker)
+    except AnalysisStateError as exc:
+        print(f"erro: {exc}")
         return 1
-    data = AnalysisData.model_validate_json((folder / "data.json").read_text(encoding="utf-8"))
     with connect(get_settings().db_path, read_only=True) as conn:
-        report = run_validation(data, conn, args.ticker)
-    path = folder / "validation.json"
-    path.write_text(report.model_dump_json(indent=2) + "\n", encoding="utf-8")
+        report = run_validation(folder.data, conn, args.ticker)
+    path = folder.write("validation.json", report)
     labels = {"info": "info", "warning": "aviso", "error": "erro"}
     for check in report.checks:
         status = "ok" if check.passed else labels[check.severity]
@@ -140,6 +136,67 @@ def _cmd_validate(args: argparse.Namespace) -> int:
         print("BLOQUEADO: corrija os erros antes de rodar qualquer valuation.")
         return 1
     return 0
+
+
+def _cmd_indicators(args: argparse.Namespace) -> int:
+    try:
+        folder = AnalysisFolder.latest(args.ticker)
+        folder.validation()
+    except AnalysisStateError as exc:
+        print(f"erro: {exc}")
+        return 1
+    report = compute_indicators(folder.data, args.ticker, load_config().bazin)
+    path = folder.write("indicators.json", report)
+    for name, value in report.values.items():
+        print(f"{name:34} {_format_value(value.value, value.unit)}")
+    for name, reason in report.unavailable.items():
+        print(f"{name:34} indisponível: {reason}")
+    print(f"indicadores: {path.relative_to(PROJECT_ROOT)}")
+    return 0
+
+
+def _cmd_valuate(args: argparse.Namespace) -> int:
+    try:
+        folder = AnalysisFolder.latest(args.ticker)
+        folder.validation()
+        indicators = folder.indicators()
+    except AnalysisStateError as exc:
+        print(f"erro: {exc}")
+        return 1
+    config = load_config()
+    results = []
+    if args.method in ("graham", "all"):
+        results.append(value_graham(folder.data, indicators, args.ticker, config))
+    if args.method in ("bazin", "all"):
+        for net in (False, True):
+            results.append(value_bazin(folder.data, indicators, args.ticker, config, net=net))
+    for result in results:
+        path = folder.write(f"valuations/{result.method}.json", result)
+        print(f"{result.method}: {path.relative_to(PROJECT_ROOT)}")
+        if not result.applicable:
+            print(f"  não aplicável: {result.not_applicable_reason}")
+            continue
+        out = result.result
+        if out.fair_value is not None:
+            print(f"  valor justo: R$ {_format_brl(out.fair_value)}")
+        if out.ceiling_price is not None:
+            print(f"  preço-teto: R$ {_format_brl(out.ceiling_price)}")
+        for ceiling in out.ceiling_prices:
+            print(
+                f"  preço-teto com margem de {ceiling.margin_of_safety * 100:.0f}%: "
+                f"R$ {_format_brl(ceiling.price)}"
+            )
+        if out.price is not None:
+            print(f"  preço atual: R$ {_format_brl(out.price)}")
+    return 0
+
+
+def _format_value(value: Decimal, unit: str) -> str:
+    if unit == "ratio":
+        return f"{value:.4f}"
+    if unit == "shares":
+        return f"{value:,.0f}".replace(",", ".")
+    return f"R$ {_format_brl(value)}" + (" por ação" if unit == "BRL/share" else "")
 
 
 def _format_brl(value: Decimal) -> str:
@@ -258,6 +315,8 @@ COMMANDS: dict[str, Callable[[argparse.Namespace], int]] = {
     "series": _cmd_series,
     "snapshot": _cmd_snapshot,
     "validate": _cmd_validate,
+    "indicators": _cmd_indicators,
+    "valuate": _cmd_valuate,
 }
 
 
@@ -290,6 +349,15 @@ def build_parser() -> argparse.ArgumentParser:
     )
     validate.add_argument("ticker", help="código de negociação, ex.: BBAS3")
     validate.add_argument("-v", "--verbose", action="store_true", help="mostra todos os detalhes")
+    indicators = sub.add_parser(
+        "indicators", help="calcula os indicadores do último snapshot validado (indicators.json)"
+    )
+    indicators.add_argument("ticker", help="código de negociação, ex.: BBAS3")
+    valuate = sub.add_parser(
+        "valuate", help="roda os métodos de valuation e grava valuations/<método>.json"
+    )
+    valuate.add_argument("ticker", help="código de negociação, ex.: BBAS3")
+    valuate.add_argument("--method", choices=["graham", "bazin", "all"], default="all")
     return parser
 
 

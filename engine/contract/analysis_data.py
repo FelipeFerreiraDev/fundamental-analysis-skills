@@ -65,7 +65,7 @@ class CorporateAction(ContractModel):
 
 
 class AnalysisData(ContractModel):
-    schema_version: Literal["0.2.0"] = SCHEMA_VERSION
+    schema_version: Literal["0.3.0"] = SCHEMA_VERSION
     company: Company
     reference_date: date = Field(description="Date of the latest financial statements used.")
     as_of: datetime = Field(description="When the snapshot was taken from the local database.")
