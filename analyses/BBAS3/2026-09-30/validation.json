@@ -1,0 +1,130 @@
+{
+  "schema_version": "0.2.0",
+  "ticker": "BBAS3",
+  "reference_date": "2026-09-30",
+  "snapshot_as_of": "2026-11-21T14:06:46",
+  "generated_at": "2026-11-21T14:06:47",
+  "engine_version": "0.1.0",
+  "checks": [
+    {
+      "id": "required_inputs",
+      "severity": "error",
+      "passed": true,
+      "message": "Todos os dados mínimos estão presentes.",
+      "details": []
+    },
+    {
+      "id": "balance_sheet_identity",
+      "severity": "error",
+      "passed": true,
+      "message": "Ativo total igual a passivo + patrimônio em 16 balanços.",
+      "details": []
+    },
+    {
+      "id": "quarter_consistency",
+      "severity": "warning",
+      "passed": false,
+      "message": "Trimestres não batem com a diferença dos acumulados: o documento mais recente revisou um trimestre anterior dentro do acumulado. Use o acumulado mais recente.",
+      "details": [
+        "financial_intermediation_revenue 2026-04-01 a 2026-06-30: trimestre 81.771.473.000,00 ≠ acumulado 160.747.114.000,00 − 78.452.578.000,00",
+        "gross_financial_intermediation_result 2026-04-01 a 2026-06-30: trimestre 25.682.799.000,00 ≠ acumulado 49.463.309.000,00 − 23.257.447.000,00"
+      ]
+    },
+    {
+      "id": "zero_flows",
+      "severity": "warning",
+      "passed": true,
+      "message": "Nenhum valor anual zerado.",
+      "details": []
+    },
+    {
+      "id": "price_freshness",
+      "severity": "warning",
+      "passed": true,
+      "message": "Cotação recente.",
+      "details": [
+        "BBAS3: R$ 14,30 em 2026-11-20 (1 dias)"
+      ]
+    },
+    {
+      "id": "price_after_statements",
+      "severity": "info",
+      "passed": true,
+      "message": "O preço é posterior ao último balanço: eventos entre as duas datas não estão nos números contábeis.",
+      "details": [
+        "BBAS3: preço em 2026-11-20, balanço em 2026-09-30 (51 dias depois)"
+      ]
+    },
+    {
+      "id": "accounting_breaks",
+      "severity": "warning",
+      "passed": false,
+      "message": "Há quebras de série contábil conhecidas no período analisado.",
+      "details": [
+        "Layout da CVM para bancos mudou em 2020: algumas contas só são comparáveis a partir dele (docs/architecture.md §7.2).",
+        "Resolução CMN 4.966 (vigente desde 01/01/2025): provisão por perda esperada; provisões, resultado e patrimônio antes e depois de 2025 não são diretamente comparáveis."
+      ]
+    },
+    {
+      "id": "restatements",
+      "severity": "warning",
+      "passed": false,
+      "message": "34 valores foram reapresentados em documentos posteriores; a análise usa sempre o valor mais recente.",
+      "details": [
+        "administrative_expenses 3M 2025-06-30: -2.225.313.000,00 (ITR 2025-06-30 v1) → -2.369.026.000,00 (ITR 2026-06-30 v1)",
+        "administrative_expenses 3M 2025-09-30: -2.242.205.000,00 (ITR 2025-09-30 v1) → -2.386.137.000,00 (ITR 2026-09-30 v1)",
+        "administrative_expenses FY 2017-12-31: -10.601.093.000,00 (DFP 2017-12-31 v2) → -9.282.288.000,00 (DFP 2018-12-31 v2)",
+        "administrative_expenses FY 2022-12-31: -8.170.710.000,00 (DFP 2022-12-31 v1) → -7.941.143.000,00 (DFP 2023-12-31 v1)",
+        "administrative_expenses FY 2023-12-31: -8.740.985.000,00 (DFP 2023-12-31 v1) → -8.065.828.000,00 (DFP 2024-12-31 v1)",
+        "administrative_expenses FY 2024-12-31: -9.124.925.000,00 (DFP 2024-12-31 v1) → -9.729.298.000,00 (DFP 2025-12-31 v1)",
+        "administrative_expenses YTD 2025-03-31: -2.160.060.000,00 (ITR 2025-03-31 v1) → -2.312.794.000,00 (ITR 2026-03-31 v1)",
+        "administrative_expenses YTD 2025-06-30: -4.385.373.000,00 (ITR 2025-06-30 v1) → -4.681.820.000,00 (ITR 2026-06-30 v1)",
+        "administrative_expenses YTD 2025-09-30: -6.627.578.000,00 (ITR 2025-09-30 v1) → -7.067.957.000,00 (ITR 2026-09-30 v1)",
+        "cash_and_equivalents INSTANT 2023-12-31: 54.999.815.000,00 (DFP 2023-12-31 v1) → 56.999.814.000,00 (DFP 2024-12-31 v1)",
+        "credit_operations INSTANT 2024-12-31: 1.020.552.099.000,00 (DFP 2024-12-31 v1) → 1.030.007.106.000,00 (DFP 2025-12-31 v1)",
+        "equity INSTANT 2022-12-31: 158.956.355.000,00 (DFP 2022-12-31 v1) → 159.657.194.000,00 (DFP 2023-12-31 v1)",
+        "equity_total INSTANT 2022-12-31: 163.077.123.000,00 (DFP 2022-12-31 v1) → 163.517.752.000,00 (DFP 2023-12-31 v1)",
+        "financial_intermediation_revenue FY 2017-12-31: 139.763.614.000,00 (DFP 2017-12-31 v2) → 147.064.451.000,00 (DFP 2018-12-31 v2)",
+        "financing_cash_flow FY 2020-12-31: -17.334.908.000,00 (DFP 2020-12-31 v2) → -20.992.277.000,00 (DFP 2021-12-31 v2)",
+        "financing_cash_flow FY 2021-12-31: -24.982.150.000,00 (DFP 2021-12-31 v2) → -25.002.890.000,00 (DFP 2022-12-31 v1)",
+        "income_before_taxes FY 2022-12-31: 38.301.717.000,00 (DFP 2022-12-31 v1) → 38.453.561.000,00 (DFP 2023-12-31 v1)",
+        "investing_cash_flow FY 2019-12-31: -30.587.074.000,00 (DFP 2019-12-31 v2) → -30.242.912.000,00 (DFP 2020-12-31 v2)",
+        "net_income FY 2022-12-31: 27.630.407.000,00 (DFP 2022-12-31 v1) → 27.731.162.000,00 (DFP 2023-12-31 v1)",
+        "net_income_consolidated FY 2022-12-31: 29.849.335.000,00 (DFP 2022-12-31 v1) → 30.001.179.000,00 (DFP 2023-12-31 v1)",
+        "non_controlling_interests INSTANT 2022-12-31: 4.120.768.000,00 (DFP 2022-12-31 v1) → 3.860.558.000,00 (DFP 2023-12-31 v1)",
+        "operating_cash_flow FY 2019-12-31: 58.542.666.000,00 (DFP 2019-12-31 v2) → 58.198.504.000,00 (DFP 2020-12-31 v2)",
+        "operating_cash_flow FY 2020-12-31: 206.975.326.000,00 (DFP 2020-12-31 v2) → 210.632.695.000,00 (DFP 2021-12-31 v2)",
+        "operating_cash_flow FY 2021-12-31: -44.779.882.000,00 (DFP 2021-12-31 v2) → -44.759.142.000,00 (DFP 2022-12-31 v1)",
+        "operating_cash_flow FY 2023-12-31: 14.740.786.000,00 (DFP 2023-12-31 v1) → 16.740.785.000,00 (DFP 2024-12-31 v1)",
+        "service_fee_revenue 3M 2025-06-30: 7.979.312.000,00 (ITR 2025-06-30 v1) → 8.692.956.000,00 (ITR 2026-06-30 v1)",
+        "service_fee_revenue 3M 2025-09-30: 7.539.510.000,00 (ITR 2025-09-30 v1) → 8.790.864.000,00 (ITR 2026-09-30 v1)",
+        "service_fee_revenue FY 2023-12-31: 25.000.273.000,00 (DFP 2023-12-31 v1) → 26.315.600.000,00 (DFP 2024-12-31 v1)",
+        "service_fee_revenue FY 2024-12-31: 28.033.530.000,00 (DFP 2024-12-31 v1) → 33.198.229.000,00 (DFP 2025-12-31 v1)",
+        "service_fee_revenue YTD 2025-03-31: 6.457.488.000,00 (ITR 2025-03-31 v1) → 8.356.487.000,00 (ITR 2026-03-31 v1)",
+        "service_fee_revenue YTD 2025-06-30: 14.436.800.000,00 (ITR 2025-06-30 v1) → 17.049.443.000,00 (ITR 2026-06-30 v1)",
+        "service_fee_revenue YTD 2025-09-30: 21.976.310.000,00 (ITR 2025-09-30 v1) → 25.840.307.000,00 (ITR 2026-09-30 v1)",
+        "total_assets INSTANT 2022-12-31: 2.007.727.977.000,00 (DFP 2022-12-31 v1) → 2.008.168.606.000,00 (DFP 2023-12-31 v1)",
+        "total_liabilities_and_equity INSTANT 2022-12-31: 2.007.727.977.000,00 (DFP 2022-12-31 v1) → 2.008.168.606.000,00 (DFP 2023-12-31 v1)"
+      ]
+    },
+    {
+      "id": "large_price_moves",
+      "severity": "warning",
+      "passed": false,
+      "message": "Variações diárias fortes sem evento de ações: confira notícias e fatos relevantes antes de usar o preço.",
+      "details": [
+        "BBAS3 2026-10-26: R$ 24,72 → R$ 17,47 (-29.3%), sem provento ou evento de ações próximo"
+      ]
+    },
+    {
+      "id": "reported_eps",
+      "severity": "warning",
+      "passed": true,
+      "message": "Lucro e quantidade de ações coerentes com o lucro por ação reportado.",
+      "details": [
+        "2024-12-31: reportado R$ 4.6200 | lucro ÷ ações no fim do ano R$ 4.6178 (diferença 0.05%; o reportado usa a média ponderada de ações)"
+      ]
+    }
+  ],
+  "blocking": false
+}

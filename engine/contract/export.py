@@ -8,6 +8,7 @@ from pathlib import Path
 from pydantic import BaseModel
 
 from engine.contract.analysis_data import AnalysisData
+from engine.contract.validation import ValidationReport
 from engine.contract.valuation import ValuationResult
 from engine.settings import PROJECT_ROOT
 
@@ -16,6 +17,7 @@ JSON_SCHEMA_DIALECT = "https://json-schema.org/draft/2020-12/schema"
 
 CONTRACT_MODELS: dict[str, type[BaseModel]] = {
     "analysis-data": AnalysisData,
+    "validation-report": ValidationReport,
     "valuation-result": ValuationResult,
 }
 

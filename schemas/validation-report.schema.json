@@ -1,0 +1,106 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$defs": {
+    "Check": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "pattern": "^[a-z][a-z0-9_]*$",
+          "title": "Id",
+          "type": "string"
+        },
+        "severity": {
+          "enum": [
+            "info",
+            "warning",
+            "error"
+          ],
+          "title": "Severity",
+          "type": "string"
+        },
+        "passed": {
+          "title": "Passed",
+          "type": "boolean"
+        },
+        "message": {
+          "description": "Summary for the investor (Portuguese).",
+          "minLength": 1,
+          "title": "Message",
+          "type": "string"
+        },
+        "details": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Details",
+          "type": "array"
+        }
+      },
+      "required": [
+        "id",
+        "severity",
+        "passed",
+        "message"
+      ],
+      "title": "Check",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "0.2.0",
+      "default": "0.2.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "ticker": {
+      "pattern": "^[A-Z]{4}[0-9]{1,2}$",
+      "title": "Ticker",
+      "type": "string"
+    },
+    "reference_date": {
+      "format": "date",
+      "title": "Reference Date",
+      "type": "string"
+    },
+    "snapshot_as_of": {
+      "format": "date-time",
+      "title": "Snapshot As Of",
+      "type": "string"
+    },
+    "generated_at": {
+      "format": "date-time",
+      "title": "Generated At",
+      "type": "string"
+    },
+    "engine_version": {
+      "title": "Engine Version",
+      "type": "string"
+    },
+    "checks": {
+      "items": {
+        "$ref": "#/$defs/Check"
+      },
+      "minItems": 1,
+      "title": "Checks",
+      "type": "array"
+    },
+    "blocking": {
+      "description": "True when an error check failed: no valuation may run.",
+      "title": "Blocking",
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "ticker",
+    "reference_date",
+    "snapshot_as_of",
+    "generated_at",
+    "engine_version",
+    "checks",
+    "blocking"
+  ],
+  "title": "ValidationReport",
+  "type": "object"
+}

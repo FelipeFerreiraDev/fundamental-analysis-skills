@@ -205,8 +205,8 @@ Regras validadas pelo contrato:
 
 ```
 analyses/<TICKER>/<data-base>/
-├── data.json              # snapshot: empresa, ações por classe, séries históricas, mercado, macro, fontes
-├── validation.json
+├── data.json              # snapshot: empresa, ações, séries contábeis, preço, macro, proventos, fontes
+├── validation.json        # resultado das checagens; erro bloqueia os valuations
 ├── indicators.json
 ├── valuations/<metodo>.json
 ├── sector/<setor>.json
@@ -216,6 +216,29 @@ analyses/<TICKER>/<data-base>/
 ```
 
 `data.json` registra a data da base usada e os ids de ingestão. Atualizar o banco depois não altera uma análise já feita.
+
+**Conteúdo do `data.json` (contrato 0.2.0):**
+- `company`, `reference_date` (data do último balanço), `as_of` (momento do snapshot).
+- `financials`: séries consolidadas de cada conceito do mapa de contas, sempre o valor mais recente de cada período.
+- `market.prices`: a cotação mais recente entre o fechamento do COTAHIST e a cotação da brapi (em empate, o COTAHIST, que é oficial). `market.shares_outstanding`: ações emitidas − ações em tesouraria no último balanço (`derived`).
+- `macro`: `selic_target` (meta Selic do dia) e `ipca_12m` (IPCA acumulado em 12 meses, `derived`).
+- `corporate_actions`: proventos e eventos de ações exatamente como a B3 publica, sem ajuste.
+- `sources`: um item por documento ou arquivo usado, referenciado por todos os valores.
+
+**`validation.json`** — checagens que rodam antes de qualquer valuation (`skillsinvest validate`). `error` bloqueia os valuations; `warning` precisa aparecer no relatório; `info` documenta algo relevante.
+
+| Checagem | Severidade | O que verifica |
+|---|---|---|
+| `required_inputs` | error | Cotação, ações, 3+ anos de lucro anual, patrimônio na data-base e proventos |
+| `balance_sheet_identity` | error | Ativo total = passivo + patrimônio em todos os balanços |
+| `quarter_consistency` | warning | Trimestre = acumulado do ano − acumulado anterior (diferença indica revisão de trimestre anterior) |
+| `zero_flows` | warning | Valores anuais exatamente zero (conta não preenchida pela empresa) |
+| `price_freshness` | warning | Cotação com mais de 7 dias |
+| `price_after_statements` | info | Distância entre a data do preço e a do último balanço |
+| `accounting_breaks` | warning/info | Layout de bancos de 2020 e Resolução CMN 4.966 (2025) |
+| `restatements` | warning | Valores alterados por documentos posteriores |
+| `large_price_moves` | warning | Variação diária acima de 15% sem provento ou evento de ações em ±5 dias |
+| `reported_eps` | warning | Lucro ÷ ações perto do lucro por ação reportado (tolerância 2%) |
 
 Formato comum de resultado de valuation:
 
@@ -268,6 +291,7 @@ Formato comum de resultado de valuation:
 - **Normalização na entrada:** escala (`ESCALA_MOEDA`) → unidade; `DECIMAL` para valores monetários, nunca float; encoding dos CSVs da CVM corrigido.
 - **Template contábil** (`non_financial`, `bank`, `insurance`) determina o plano de contas usado. Ele é diferente do setor (§5) e é detectado no próprio DFP, pelo nome da primeira linha da DRE (conta 3.01: "Intermediação Financeira" → `bank`).
 - **Mapa de contas** ([engine/reference/account_map.csv](../engine/reference/account_map.csv)): liga cada código de conta da CVM (`CD_CONTA`), por template, a um conceito canônico do contrato (`net_income`, `equity`...). A vigência (`valid_from`/`valid_to`) vale para a **data de referência do documento**, não para o período do valor, porque o layout pertence ao documento. Motivo: a CVM mudou o plano de contas dos bancos em 2020, e o mesmo código passou a significar outra coisa (ex.: DRE 3.04.01 era "Receitas de Prestação de Serviços" e virou "Provisão para Perda Esperada"; DRE 3.09.01 era o lucro do controlador e o lucro passou para 3.11.01). O DFP 2020 reapresenta 2019 já no layout novo. A view `v_concept_facts` entrega um valor por conceito e período, sempre do documento mais recente.
+- **Contas zeradas no layout antigo também não são mapeadas.** O BB deixou "Receitas de Prestação de Serviços" (3.04.01) zerada até 2019 e lançou a receita em outra linha; mapear essa conta criaria uma série com zeros falsos. A checagem `zero_flows` do validador pega casos novos.
 - **Conceitos que mudaram de significado não são mapeados no layout antigo.** Ex.: até 2019, o resultado bruto de intermediação dos bancos já descontava a provisão de crédito; a partir de 2020, não. Para não misturar coisas diferentes na mesma série, `gross_financial_intermediation_result` e `credit_loss_expense` só existem a partir do layout de 2020. `equity` (patrimônio do controlador) também só existe no layout novo; no antigo, ele é derivado como `equity_total − non_controlling_interests`.
 - **Setor:** vem do `SETOR_ATIV` do cadastro da CVM, via [engine/reference/cvm_sectors.yaml](../engine/reference/cvm_sectors.yaml) (o prefixo "Emp. Adm. Part. - " é ignorado). Exceções por ticker ficam em `config/sector_overrides.yaml`. Setor sem perfil gera aviso no `sync`.
 - **Bancos:** indicadores prudenciais (Basileia, CET1...) são do conglomerado prudencial (`basis = prudential`), não do consolidado IFRS.

@@ -11,6 +11,7 @@ from decimal import Decimal
 
 from engine import __version__
 from engine.config import DEFAULTS_PATH, load_config, load_sector_overrides
+from engine.contract import AnalysisData
 from engine.contract.export import SCHEMAS_DIR, export_schemas, outdated_schemas
 from engine.db import connect, init_database, pending_migrations
 from engine.db.reference import read_cvm_sector_map
@@ -18,6 +19,8 @@ from engine.ingest.http import HttpFetcher, purge_expired_cache
 from engine.ingest.market_sync import sync_macro, sync_market
 from engine.ingest.sync import TickerNotFoundError, sync_company
 from engine.settings import EXTERNAL_URL_FIELDS, PROJECT_ROOT, env_file_path, get_settings
+from engine.snapshot.build import ANALYSES_DIR, SnapshotError, build_snapshot, write_snapshot
+from engine.validation.checks import run_validation
 
 
 def _cmd_sync(args: argparse.Namespace) -> int:
@@ -85,6 +88,57 @@ def _cmd_sync(args: argparse.Namespace) -> int:
         print(f"pontos novos: {macro_report.points_added}")
         for series_code, (ref_date, value) in macro_report.last_points.items():
             print(f"  {series_code}: {value} em {ref_date}")
+    return 0
+
+
+def _cmd_snapshot(args: argparse.Namespace) -> int:
+    settings = get_settings()
+    with connect(settings.db_path, read_only=True) as conn:
+        try:
+            data = build_snapshot(conn, args.ticker)
+        except SnapshotError as exc:
+            print(f"erro: {exc}")
+            return 1
+    path = write_snapshot(data, args.ticker)
+    print(f"snapshot: {path.relative_to(PROJECT_ROOT)}")
+    print(f"data-base: {data.reference_date} | tirado em: {data.as_of}")
+    for ticker, price in data.market.prices.items():
+        print(f"preço {ticker}: R$ {_format_brl(price.value)} em {price.period.end}")
+    print(
+        f"conceitos: {len(data.financials)} | valores: "
+        f"{sum(len(v) for v in data.financials.values())} | proventos e eventos: "
+        f"{len(data.corporate_actions)} | fontes: {len(data.sources)}"
+    )
+    return 0
+
+
+def latest_analysis_dir(ticker: str):
+    folder = ANALYSES_DIR / ticker.upper()
+    candidates = sorted(p for p in folder.glob("*") if (p / "data.json").exists())
+    return candidates[-1] if candidates else None
+
+
+def _cmd_validate(args: argparse.Namespace) -> int:
+    folder = latest_analysis_dir(args.ticker)
+    if folder is None:
+        print(f"erro: nenhum snapshot de {args.ticker.upper()} — rode: skillsinvest snapshot")
+        return 1
+    data = AnalysisData.model_validate_json((folder / "data.json").read_text(encoding="utf-8"))
+    with connect(get_settings().db_path, read_only=True) as conn:
+        report = run_validation(data, conn, args.ticker)
+    path = folder / "validation.json"
+    path.write_text(report.model_dump_json(indent=2) + "\n", encoding="utf-8")
+    labels = {"info": "info", "warning": "aviso", "error": "erro"}
+    for check in report.checks:
+        status = "ok" if check.passed else labels[check.severity]
+        print(f"[{status:5}] {check.id}: {check.message}")
+        if not check.passed or args.verbose:
+            for detail in check.details:
+                print(f"          - {detail}")
+    print(f"validação: {path.relative_to(PROJECT_ROOT)}")
+    if report.blocking:
+        print("BLOQUEADO: corrija os erros antes de rodar qualquer valuation.")
+        return 1
     return 0
 
 
@@ -202,6 +256,8 @@ COMMANDS: dict[str, Callable[[argparse.Namespace], int]] = {
     "doctor": _cmd_doctor,
     "sync": _cmd_sync,
     "series": _cmd_series,
+    "snapshot": _cmd_snapshot,
+    "validate": _cmd_validate,
 }
 
 
@@ -225,6 +281,15 @@ def build_parser() -> argparse.ArgumentParser:
     series.add_argument("concept", help="conceito do account_map, ex.: net_income")
     series.add_argument("--period", choices=["INSTANT", "3M", "YTD", "FY"], default=None)
     series.add_argument("--basis", choices=["consolidated", "individual"], default="consolidated")
+    snapshot = sub.add_parser(
+        "snapshot", help="gera analyses/<TICKER>/<data-base>/data.json a partir do banco"
+    )
+    snapshot.add_argument("ticker", help="código de negociação, ex.: BBAS3")
+    validate = sub.add_parser(
+        "validate", help="valida o último data.json do ticker e grava validation.json"
+    )
+    validate.add_argument("ticker", help="código de negociação, ex.: BBAS3")
+    validate.add_argument("-v", "--verbose", action="store_true", help="mostra todos os detalhes")
     return parser
 
 

@@ -69,6 +69,140 @@
       "title": "Company",
       "type": "object"
     },
+    "CorporateAction": {
+      "additionalProperties": false,
+      "description": "A cash distribution or share event exactly as published by B3 (no adjustment).",
+      "properties": {
+        "ticker": {
+          "pattern": "^[A-Z]{4}[0-9]{1,2}$",
+          "title": "Ticker",
+          "type": "string"
+        },
+        "action_type": {
+          "enum": [
+            "dividend",
+            "jcp",
+            "split",
+            "reverse_split",
+            "bonus_shares",
+            "other"
+          ],
+          "title": "Action Type",
+          "type": "string"
+        },
+        "source_label": {
+          "description": "Label as published, e.g. JRS CAP PROPRIO.",
+          "title": "Source Label",
+          "type": "string"
+        },
+        "declared_at": {
+          "anyOf": [
+            {
+              "format": "date",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Declared At"
+        },
+        "record_date": {
+          "description": "Data-com: last day with the right to the event.",
+          "format": "date",
+          "title": "Record Date",
+          "type": "string"
+        },
+        "payment_date": {
+          "anyOf": [
+            {
+              "format": "date",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Payment Date"
+        },
+        "value_per_share": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "BRL per share (cash).",
+          "title": "Value Per Share"
+        },
+        "is_gross": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "JCP: value before withholding tax.",
+          "title": "Is Gross"
+        },
+        "factor": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "New shares per old share.",
+          "title": "Factor"
+        },
+        "related_to": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Related To"
+        },
+        "source_ids": {
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Source Ids",
+          "type": "array"
+        }
+      },
+      "required": [
+        "ticker",
+        "action_type",
+        "source_label",
+        "record_date",
+        "source_ids"
+      ],
+      "title": "CorporateAction",
+      "type": "object"
+    },
     "FinancialValue": {
       "additionalProperties": false,
       "description": "A single number with everything needed to trace and audit it.",
@@ -393,8 +527,8 @@
   "additionalProperties": false,
   "properties": {
     "schema_version": {
-      "const": "0.1.0",
-      "default": "0.1.0",
+      "const": "0.2.0",
+      "default": "0.2.0",
       "title": "Schema Version",
       "type": "string"
     },
@@ -444,6 +578,14 @@
       },
       "title": "Macro",
       "type": "object"
+    },
+    "corporate_actions": {
+      "description": "Dividends, JCP and share events, unadjusted.",
+      "items": {
+        "$ref": "#/$defs/CorporateAction"
+      },
+      "title": "Corporate Actions",
+      "type": "array"
     },
     "sources": {
       "items": {

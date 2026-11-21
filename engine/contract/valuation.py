@@ -53,7 +53,7 @@ class ValuationOutput(ContractModel):
 
 
 class ValuationResult(ContractModel):
-    schema_version: Literal["0.1.0"] = SCHEMA_VERSION
+    schema_version: Literal["0.2.0"] = SCHEMA_VERSION
     method: str = Field(pattern=SNAKE_CASE, description="e.g. graham_number, bazin")
     ticker: str = Field(pattern=TICKER)
     reference_date: date

@@ -28,6 +28,5 @@ def reported(value: str, unit: str = "BRL", **overrides) -> dict:
 
 
 def instant(value: str, unit: str, **overrides) -> dict:
-    return reported(
-        value, unit, period={"type": "INSTANT", "end": date(2025, 12, 31)}, basis=None, **overrides
-    )
+    overrides = {"basis": None, **overrides}
+    return reported(value, unit, period={"type": "INSTANT", "end": date(2025, 12, 31)}, **overrides)

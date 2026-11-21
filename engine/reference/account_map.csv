@@ -10,7 +10,6 @@ bank,DRE,3.05,income_before_taxes,1,,,Resultado antes dos Tributos sobre o Lucro
 bank,DRE,3.06,income_taxes,1,,,Imposto de Renda e Contribuição Social
 bank,BPP,2.08,equity_total,1,,2019-12-31,Layout até 2019: Patrimônio Líquido Consolidado
 bank,BPP,2.08.09,non_controlling_interests,1,,2019-12-31,Layout até 2019: Participação dos Acionistas Não Controladores
-bank,DRE,3.04.01,service_fee_revenue,1,,2019-12-31,Layout até 2019: Receitas de Prestação de Serviços
 bank,DRE,3.04.02,personnel_expenses,1,,2019-12-31,Layout até 2019: Despesas de Pessoal (negativo)
 bank,DRE,3.04.03,administrative_expenses,1,,2019-12-31,Layout até 2019: Outras Despesas Administrativas (negativo)
 bank,DRE,3.09,net_income_consolidated,1,,2019-12-31,Layout até 2019: Lucro/Prejuízo Consolidado do Período

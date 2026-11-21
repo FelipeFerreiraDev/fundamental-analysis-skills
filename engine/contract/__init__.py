@@ -4,7 +4,7 @@ The pydantic models here are the single source of truth. The JSON Schemas in `sc
 are generated from them with `skillsinvest export-schemas`.
 """
 
-from engine.contract.analysis_data import AnalysisData, MarketData
+from engine.contract.analysis_data import AnalysisData, CorporateAction, MarketData
 from engine.contract.common import (
     SCHEMA_VERSION,
     Company,
@@ -20,6 +20,7 @@ __all__ = [
     "AnalysisData",
     "Assumption",
     "Company",
+    "CorporateAction",
     "FinancialValue",
     "MarketData",
     "Period",

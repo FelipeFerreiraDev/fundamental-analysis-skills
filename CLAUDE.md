@@ -39,6 +39,7 @@ Arquitetura completa e decisões: [docs/architecture.md](docs/architecture.md). 
 - Depois de mudar `engine/contract/`: `.venv/bin/skillsinvest export-schemas`
 - Mudança no schema do banco: nova migração `engine/db/migrations/NNNN_nome.sql`. Nunca edite uma migração já aplicada.
 - Carregar dados de uma empresa: `.venv/bin/skillsinvest sync <TICKER>`; consultar: `.venv/bin/skillsinvest series <TICKER> <conceito>`.
+- Preparar uma análise: `.venv/bin/skillsinvest snapshot <TICKER>` e `.venv/bin/skillsinvest validate <TICKER>`. Nenhum valuation roda se `validation.json` tiver `blocking: true`; todo `warning` aparece no relatório.
 - Mapa de contas (`engine/reference/account_map.csv`): a vigência vale para a data de referência do documento, e um conceito nunca mistura contas de significados diferentes (ver docs/architecture.md §7.2). Confira os nomes das contas nos dados reais antes de mapear.
 - Testes nunca acessam a rede: use os arquivos sintéticos de `tests/cvm_files.py`.
 
