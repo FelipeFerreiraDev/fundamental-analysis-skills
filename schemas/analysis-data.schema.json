@@ -1,0 +1,468 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$defs": {
+    "Company": {
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "minLength": 1,
+          "title": "Name",
+          "type": "string"
+        },
+        "cnpj": {
+          "description": "Digits only.",
+          "pattern": "^[0-9]{14}$",
+          "title": "Cnpj",
+          "type": "string"
+        },
+        "cvm_code": {
+          "minimum": 1,
+          "title": "Cvm Code",
+          "type": "integer"
+        },
+        "accounting_template": {
+          "enum": [
+            "non_financial",
+            "bank",
+            "insurance"
+          ],
+          "title": "Accounting Template",
+          "type": "string"
+        },
+        "sector": {
+          "enum": [
+            "banking",
+            "insurance",
+            "real-estate",
+            "fii",
+            "utilities",
+            "infrastructure",
+            "retail",
+            "consumer",
+            "industrial",
+            "commodities",
+            "healthcare",
+            "tmt",
+            "education",
+            "holdings"
+          ],
+          "title": "Sector",
+          "type": "string"
+        },
+        "securities": {
+          "items": {
+            "$ref": "#/$defs/Security"
+          },
+          "minItems": 1,
+          "title": "Securities",
+          "type": "array"
+        }
+      },
+      "required": [
+        "name",
+        "cnpj",
+        "cvm_code",
+        "accounting_template",
+        "sector",
+        "securities"
+      ],
+      "title": "Company",
+      "type": "object"
+    },
+    "FinancialValue": {
+      "additionalProperties": false,
+      "description": "A single number with everything needed to trace and audit it.",
+      "properties": {
+        "value": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "string"
+            }
+          ],
+          "title": "Value"
+        },
+        "unit": {
+          "enum": [
+            "BRL",
+            "BRL/share",
+            "shares",
+            "ratio",
+            "count"
+          ],
+          "title": "Unit",
+          "type": "string"
+        },
+        "period": {
+          "$ref": "#/$defs/Period"
+        },
+        "basis": {
+          "anyOf": [
+            {
+              "enum": [
+                "consolidated",
+                "individual",
+                "prudential",
+                "managerial"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Required for accounting data; null for market and macro data.",
+          "title": "Basis"
+        },
+        "nature": {
+          "enum": [
+            "reported",
+            "derived",
+            "estimated"
+          ],
+          "title": "Nature",
+          "type": "string"
+        },
+        "source_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Source Ids",
+          "type": "array"
+        },
+        "confidence": {
+          "enum": [
+            "high",
+            "medium",
+            "low"
+          ],
+          "title": "Confidence",
+          "type": "string"
+        },
+        "note": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "How a derived value was computed, or why an estimate was chosen.",
+          "title": "Note"
+        }
+      },
+      "required": [
+        "value",
+        "unit",
+        "period",
+        "nature",
+        "confidence"
+      ],
+      "title": "FinancialValue",
+      "type": "object"
+    },
+    "MarketData": {
+      "additionalProperties": false,
+      "properties": {
+        "prices": {
+          "additionalProperties": {
+            "$ref": "#/$defs/FinancialValue"
+          },
+          "description": "Ticker -> price (BRL/share, INSTANT).",
+          "title": "Prices",
+          "type": "object"
+        },
+        "shares_outstanding": {
+          "additionalProperties": {
+            "$ref": "#/$defs/FinancialValue"
+          },
+          "description": "Ticker -> shares outstanding excluding treasury shares (shares, INSTANT).",
+          "title": "Shares Outstanding",
+          "type": "object"
+        }
+      },
+      "required": [
+        "prices",
+        "shares_outstanding"
+      ],
+      "title": "MarketData",
+      "type": "object"
+    },
+    "Period": {
+      "additionalProperties": false,
+      "description": "Reference period of a value. Balance sheet items are INSTANT and have no start.",
+      "properties": {
+        "type": {
+          "enum": [
+            "INSTANT",
+            "3M",
+            "YTD",
+            "FY",
+            "LTM"
+          ],
+          "title": "Type",
+          "type": "string"
+        },
+        "start": {
+          "anyOf": [
+            {
+              "format": "date",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Start"
+        },
+        "end": {
+          "format": "date",
+          "title": "End",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "end"
+      ],
+      "title": "Period",
+      "type": "object"
+    },
+    "Security": {
+      "additionalProperties": false,
+      "properties": {
+        "ticker": {
+          "pattern": "^[A-Z]{4}[0-9]{1,2}$",
+          "title": "Ticker",
+          "type": "string"
+        },
+        "share_class": {
+          "enum": [
+            "ON",
+            "PN",
+            "PNA",
+            "PNB",
+            "UNIT"
+          ],
+          "title": "Share Class",
+          "type": "string"
+        }
+      },
+      "required": [
+        "ticker",
+        "share_class"
+      ],
+      "title": "Security",
+      "type": "object"
+    },
+    "Source": {
+      "additionalProperties": false,
+      "description": "A document or dataset a value came from. PDF extractions cite one page per source.",
+      "properties": {
+        "id": {
+          "pattern": "^[a-z0-9][a-z0-9._-]*$",
+          "title": "Id",
+          "type": "string"
+        },
+        "provider": {
+          "enum": [
+            "cvm",
+            "company_ri",
+            "b3",
+            "brapi",
+            "bcb",
+            "tesouro"
+          ],
+          "title": "Provider",
+          "type": "string"
+        },
+        "document_type": {
+          "description": "e.g. DFP, ITR, COTAHIST, quote, SGS",
+          "minLength": 1,
+          "title": "Document Type",
+          "type": "string"
+        },
+        "title": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Title"
+        },
+        "url": {
+          "anyOf": [
+            {
+              "pattern": "^https?://",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Url"
+        },
+        "published_at": {
+          "anyOf": [
+            {
+              "format": "date",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Published At"
+        },
+        "retrieved_at": {
+          "format": "date-time",
+          "title": "Retrieved At",
+          "type": "string"
+        },
+        "version": {
+          "anyOf": [
+            {
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Version"
+        },
+        "page": {
+          "anyOf": [
+            {
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Page"
+        },
+        "sha256": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Sha256"
+        },
+        "extraction": {
+          "enum": [
+            "structured",
+            "llm_pdf"
+          ],
+          "title": "Extraction",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "provider",
+        "document_type",
+        "retrieved_at",
+        "extraction"
+      ],
+      "title": "Source",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "0.1.0",
+      "default": "0.1.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "company": {
+      "$ref": "#/$defs/Company"
+    },
+    "reference_date": {
+      "description": "Date of the latest financial statements used.",
+      "format": "date",
+      "title": "Reference Date",
+      "type": "string"
+    },
+    "as_of": {
+      "description": "When the snapshot was taken from the local database.",
+      "format": "date-time",
+      "title": "As Of",
+      "type": "string"
+    },
+    "ingestion_run_ids": {
+      "items": {
+        "type": "string"
+      },
+      "minItems": 1,
+      "title": "Ingestion Run Ids",
+      "type": "array"
+    },
+    "market": {
+      "$ref": "#/$defs/MarketData"
+    },
+    "financials": {
+      "additionalProperties": {
+        "items": {
+          "$ref": "#/$defs/FinancialValue"
+        },
+        "type": "array"
+      },
+      "description": "Canonical concept (snake_case) -> time series of values.",
+      "title": "Financials",
+      "type": "object"
+    },
+    "macro": {
+      "additionalProperties": {
+        "items": {
+          "$ref": "#/$defs/FinancialValue"
+        },
+        "type": "array"
+      },
+      "title": "Macro",
+      "type": "object"
+    },
+    "sources": {
+      "items": {
+        "$ref": "#/$defs/Source"
+      },
+      "minItems": 1,
+      "title": "Sources",
+      "type": "array"
+    }
+  },
+  "required": [
+    "company",
+    "reference_date",
+    "as_of",
+    "ingestion_run_ids",
+    "market",
+    "financials",
+    "sources"
+  ],
+  "title": "AnalysisData",
+  "type": "object"
+}

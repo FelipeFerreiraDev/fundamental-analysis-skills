@@ -1,0 +1,10 @@
+{
+  "name": "BANCO DO BRASIL S.A.",
+  "cnpj": "00000000000191",
+  "cvm_code": 1023,
+  "accounting_template": "bank",
+  "sector": "banking",
+  "securities": [
+    { "ticker": "BBAS3", "share_class": "ON" }
+  ]
+}

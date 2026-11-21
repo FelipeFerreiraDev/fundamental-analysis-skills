@@ -1,0 +1,385 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$defs": {
+    "Assumption": {
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "pattern": "^[a-z][a-z0-9_]*$",
+          "title": "Name",
+          "type": "string"
+        },
+        "value": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "string"
+            }
+          ],
+          "title": "Value"
+        },
+        "unit": {
+          "anyOf": [
+            {
+              "enum": [
+                "BRL",
+                "BRL/share",
+                "shares",
+                "ratio",
+                "count"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Unit"
+        },
+        "justification": {
+          "minLength": 1,
+          "title": "Justification",
+          "type": "string"
+        }
+      },
+      "required": [
+        "name",
+        "value",
+        "justification"
+      ],
+      "title": "Assumption",
+      "type": "object"
+    },
+    "FinancialValue": {
+      "additionalProperties": false,
+      "description": "A single number with everything needed to trace and audit it.",
+      "properties": {
+        "value": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "string"
+            }
+          ],
+          "title": "Value"
+        },
+        "unit": {
+          "enum": [
+            "BRL",
+            "BRL/share",
+            "shares",
+            "ratio",
+            "count"
+          ],
+          "title": "Unit",
+          "type": "string"
+        },
+        "period": {
+          "$ref": "#/$defs/Period"
+        },
+        "basis": {
+          "anyOf": [
+            {
+              "enum": [
+                "consolidated",
+                "individual",
+                "prudential",
+                "managerial"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Required for accounting data; null for market and macro data.",
+          "title": "Basis"
+        },
+        "nature": {
+          "enum": [
+            "reported",
+            "derived",
+            "estimated"
+          ],
+          "title": "Nature",
+          "type": "string"
+        },
+        "source_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Source Ids",
+          "type": "array"
+        },
+        "confidence": {
+          "enum": [
+            "high",
+            "medium",
+            "low"
+          ],
+          "title": "Confidence",
+          "type": "string"
+        },
+        "note": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "How a derived value was computed, or why an estimate was chosen.",
+          "title": "Note"
+        }
+      },
+      "required": [
+        "value",
+        "unit",
+        "period",
+        "nature",
+        "confidence"
+      ],
+      "title": "FinancialValue",
+      "type": "object"
+    },
+    "Period": {
+      "additionalProperties": false,
+      "description": "Reference period of a value. Balance sheet items are INSTANT and have no start.",
+      "properties": {
+        "type": {
+          "enum": [
+            "INSTANT",
+            "3M",
+            "YTD",
+            "FY",
+            "LTM"
+          ],
+          "title": "Type",
+          "type": "string"
+        },
+        "start": {
+          "anyOf": [
+            {
+              "format": "date",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Start"
+        },
+        "end": {
+          "format": "date",
+          "title": "End",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "end"
+      ],
+      "title": "Period",
+      "type": "object"
+    },
+    "ValuationOutput": {
+      "additionalProperties": false,
+      "description": "Per-share results. Margins are fractions (0.25 means 25%).",
+      "properties": {
+        "unit": {
+          "const": "BRL/share",
+          "default": "BRL/share",
+          "title": "Unit",
+          "type": "string"
+        },
+        "fair_value": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Intrinsic value estimated by the method.",
+          "title": "Fair Value"
+        },
+        "ceiling_price": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Maximum purchase price (Bazin: the method's own result).",
+          "title": "Ceiling Price"
+        },
+        "required_margin_of_safety": {
+          "anyOf": [
+            {
+              "exclusiveMaximum": 1.0,
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Margin applied to fair_value to derive ceiling_price, when applicable.",
+          "title": "Required Margin Of Safety"
+        },
+        "margin_of_safety_at_price": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "(fair_value - price) / fair_value at the snapshot price.",
+          "title": "Margin Of Safety At Price"
+        }
+      },
+      "title": "ValuationOutput",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "0.1.0",
+      "default": "0.1.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "method": {
+      "description": "e.g. graham_number, bazin",
+      "pattern": "^[a-z][a-z0-9_]*$",
+      "title": "Method",
+      "type": "string"
+    },
+    "ticker": {
+      "pattern": "^[A-Z]{4}[0-9]{1,2}$",
+      "title": "Ticker",
+      "type": "string"
+    },
+    "reference_date": {
+      "format": "date",
+      "title": "Reference Date",
+      "type": "string"
+    },
+    "applicable": {
+      "title": "Applicable",
+      "type": "boolean"
+    },
+    "not_applicable_reason": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Not Applicable Reason"
+    },
+    "formula": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Formula"
+    },
+    "inputs": {
+      "additionalProperties": {
+        "$ref": "#/$defs/FinancialValue"
+      },
+      "title": "Inputs",
+      "type": "object"
+    },
+    "assumptions": {
+      "items": {
+        "$ref": "#/$defs/Assumption"
+      },
+      "title": "Assumptions",
+      "type": "array"
+    },
+    "result": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/ValuationOutput"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "limitations": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Limitations",
+      "type": "array"
+    },
+    "applicability_rationale": {
+      "minLength": 1,
+      "title": "Applicability Rationale",
+      "type": "string"
+    },
+    "engine_version": {
+      "title": "Engine Version",
+      "type": "string"
+    },
+    "computed_at": {
+      "format": "date-time",
+      "title": "Computed At",
+      "type": "string"
+    }
+  },
+  "required": [
+    "method",
+    "ticker",
+    "reference_date",
+    "applicable",
+    "applicability_rationale",
+    "engine_version",
+    "computed_at"
+  ],
+  "title": "ValuationResult",
+  "type": "object"
+}

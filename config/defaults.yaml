@@ -1,0 +1,12 @@
+# Parâmetros de análise do investidor (não secretos — tokens ficam no .env).
+# Percentuais sempre como fração: 0.06 = 6%.
+# Valores null ainda não foram definidos (docs/architecture.md §12).
+# O engine recusa calcular um método que dependa de um valor null.
+
+valuation:
+  margin_of_safety: null   # margem exigida para derivar o preço-teto a partir do valor justo
+  cost_of_equity: null     # Ke — custo do capital próprio
+
+bazin:
+  target_dividend_yield: 0.06
+  lookback_years: null     # janela de anos para a média de proventos

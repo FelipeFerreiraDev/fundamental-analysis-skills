@@ -1,0 +1,18 @@
+# Dados locais — reconstruíveis via sync (ver docs/architecture.md §7)
+data/
+*.duckdb
+*.duckdb.wal
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/
+*.egg-info/
+build/
+dist/
+
+# Ambiente — credenciais ficam só no .env (modelo em .env.example)
+.env
+.env.*
+!.env.example
