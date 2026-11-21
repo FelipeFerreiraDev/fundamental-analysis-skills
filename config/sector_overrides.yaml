@@ -1,0 +1,7 @@
+# Perfil setorial por ticker, para quando o mapeamento automático a partir do setor
+# da CVM não serve (docs/architecture.md §5).
+# Exemplo: uma holding cadastrada na CVM com o setor da empresa investida.
+#
+# ITSA4: holdings
+
+{}

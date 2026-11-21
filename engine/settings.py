@@ -10,7 +10,7 @@ import os
 from functools import lru_cache
 from pathlib import Path
 
-from pydantic import SecretStr
+from pydantic import SecretStr, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
@@ -35,6 +35,20 @@ class Settings(BaseSettings):
 
     brapi_token: SecretStr | None = None
     data_dir: Path = PROJECT_ROOT / "data"
+
+    # Base URLs of the external services. The defaults mirror .env.example (a test keeps
+    # them in sync) so the project works before every URL is copied into .env.
+    cvm_base_url: str = "https://dados.cvm.gov.br/dados/CIA_ABERTA"
+    b3_cotahist_base_url: str = "https://bvmf.bmfbovespa.com.br/InstDados/SerHist"
+    brapi_base_url: str = "https://brapi.dev/api"
+    bcb_sgs_base_url: str = "https://api.bcb.gov.br/dados/serie"
+
+    @field_validator("cvm_base_url", "b3_cotahist_base_url", "brapi_base_url", "bcb_sgs_base_url")
+    @classmethod
+    def _check_url(cls, value: str) -> str:
+        if not value.startswith("https://"):
+            raise ValueError("as URLs dos serviços externos devem usar https://")
+        return value.rstrip("/")
 
     @property
     def db_path(self) -> Path:

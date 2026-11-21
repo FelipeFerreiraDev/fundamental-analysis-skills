@@ -10,3 +10,7 @@ valuation:
 bazin:
   target_dividend_yield: 0.06
   lookback_years: null     # janela de anos para a média de proventos
+
+sync:
+  history_years: 10        # anos de DFP carregados (cada DFP traz também o ano anterior)
+  quarterly_years: 2       # anos de ITR carregados (cada ITR traz também o ano anterior)

@@ -1,0 +1,35 @@
+# SETOR_ATIV do cadastro da CVM -> perfil setorial (docs/architecture.md §5).
+# O prefixo "Emp. Adm. Part. - " é removido antes da busca: uma empresa de participações
+# em energia é analisada como energia. Holdings de fato vão em config/sector_overrides.yaml.
+# Setores sem perfil adequado ficam de fora e exigem um override.
+
+Bancos: banking
+Intermediação Financeira: banking
+Crédito Imobiliário: banking
+Arrendamento Mercantil: banking
+Seguradoras e Corretoras: insurance
+Construção Civil, Mat. Constr. e Decoração: real-estate
+Const. Civil, Mat. Const. e Decoração: real-estate
+Energia Elétrica: utilities
+Saneamento, Serv. Água e Gás: utilities
+Serviços Transporte e Logística: infrastructure
+Comércio (Atacado e Varejo): retail
+Têxtil e Vestuário: retail
+Alimentos: consumer
+Bebidas e Fumo: consumer
+Farmacêutico e Higiene: consumer
+Brinquedos e Lazer: consumer
+Hospedagem e Turismo: consumer
+Máquinas, Equipamentos, Veículos e Peças: industrial
+Máqs., Equip., Veíc. e Peças: industrial
+Petroquímicos e Borracha: industrial
+Metalurgia e Siderurgia: commodities
+Petróleo e Gás: commodities
+Papel e Celulose: commodities
+Extração Mineral: commodities
+Agricultura (Açúcar, Álcool e Cana): commodities
+Serviços Médicos: healthcare
+Comunicação e Informática: tmt
+Telecomunicações: tmt
+Educação: education
+Sem Setor Principal: holdings

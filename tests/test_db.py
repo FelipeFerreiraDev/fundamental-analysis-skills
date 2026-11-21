@@ -31,7 +31,8 @@ def _seed_company(conn) -> str:
         [run_id, datetime(2026, 11, 21, 10), "0" * 64],
     ).fetchone()[0]
     conn.execute(
-        "INSERT INTO companies VALUES (?, 1023, 'BANCO DO BRASIL S.A.', 'bank', 'banking', ?)",
+        "INSERT INTO companies (cnpj, cvm_code, name, accounting_template, sector, updated_at) "
+        "VALUES (?, 1023, 'BANCO DO BRASIL S.A.', 'bank', 'banking', ?)",
         [BB_CNPJ, datetime(2026, 11, 21)],
     )
     conn.execute(
@@ -115,7 +116,8 @@ def test_company_can_be_updated_while_referenced(conn):
 @pytest.mark.parametrize(
     "sql",
     [
-        "INSERT INTO companies VALUES ('1', 1, 'X', 'retail', NULL, now())",
+        "INSERT INTO companies (cnpj, cvm_code, name, accounting_template, sector, updated_at) "
+        "VALUES ('1', 1, 'X', 'retail', NULL, now())",
         "INSERT INTO securities VALUES ('XXXX3', '1', 'PREF', DATE '2020-01-01', NULL)",
     ],
 )
@@ -148,3 +150,30 @@ def test_freshness_view_reports_last_success(conn):
     _seed_company(conn)
     rows = conn.execute("SELECT provider, dataset FROM v_ingestion_freshness").fetchall()
     assert rows == [("cvm", "dfp")]
+
+
+def test_account_map_has_one_account_per_concept_and_layout():
+    """Validity ranges of a concept (or of an account code) never overlap in a template."""
+    from collections import defaultdict
+    from datetime import date as _date
+
+    from engine.db.reference import read_account_map
+
+    def bounds(row):
+        start = _date.fromisoformat(row["valid_from"]) if row["valid_from"] else _date.min
+        end = _date.fromisoformat(row["valid_to"]) if row["valid_to"] else _date.max
+        return start, end
+
+    for key_fields in (("concept",), ("statement", "account_code")):
+        groups = defaultdict(list)
+        for row in read_account_map():
+            groups[(row["accounting_template"], *(row[k] for k in key_fields))].append(bounds(row))
+        for key, ranges in groups.items():
+            ranges.sort()
+            for (_, end), (next_start, _) in zip(ranges, ranges[1:], strict=False):
+                assert end < next_start, f"overlapping validity for {key}"
+
+
+def test_reference_data_is_loaded_on_init(conn):
+    count = conn.execute("SELECT count(*) FROM account_map").fetchone()[0]
+    assert count > 0

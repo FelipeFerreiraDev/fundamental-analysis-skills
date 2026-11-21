@@ -38,6 +38,9 @@ Arquitetura completa e decisões: [docs/architecture.md](docs/architecture.md). 
 - Lint e formatação: `.venv/bin/ruff check . && .venv/bin/ruff format --check .`
 - Depois de mudar `engine/contract/`: `.venv/bin/skillsinvest export-schemas`
 - Mudança no schema do banco: nova migração `engine/db/migrations/NNNN_nome.sql`. Nunca edite uma migração já aplicada.
+- Carregar dados de uma empresa: `.venv/bin/skillsinvest sync <TICKER>`; consultar: `.venv/bin/skillsinvest series <TICKER> <conceito>`.
+- Mapa de contas (`engine/reference/account_map.csv`): a vigência vale para a data de referência do documento, e um conceito nunca mistura contas de significados diferentes (ver docs/architecture.md §7.2). Confira os nomes das contas nos dados reais antes de mapear.
+- Testes nunca acessam a rede: use os arquivos sintéticos de `tests/cvm_files.py`.
 
 ## Credenciais e README
 

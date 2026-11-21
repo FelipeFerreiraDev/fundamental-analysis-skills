@@ -7,12 +7,81 @@ from __future__ import annotations
 
 import argparse
 from collections.abc import Callable, Sequence
+from decimal import Decimal
 
 from engine import __version__
-from engine.config import DEFAULTS_PATH, load_config
+from engine.config import DEFAULTS_PATH, load_config, load_sector_overrides
 from engine.contract.export import SCHEMAS_DIR, export_schemas, outdated_schemas
 from engine.db import connect, init_database, pending_migrations
+from engine.db.reference import read_cvm_sector_map
+from engine.ingest.http import HttpFetcher, purge_expired_cache
+from engine.ingest.sync import TickerNotFoundError, sync_company
 from engine.settings import PROJECT_ROOT, env_file_path, get_settings
+
+EXTERNAL_URLS = ("cvm_base_url", "b3_cotahist_base_url", "brapi_base_url", "bcb_sgs_base_url")
+
+
+def _cmd_sync(args: argparse.Namespace) -> int:
+    settings = get_settings()
+    config = load_config()
+    init_database(settings.db_path)
+    purge_expired_cache(settings.cache_dir)
+    print(f"sincronizando {args.ticker.upper()} a partir de {settings.cvm_base_url} ...")
+    with connect(settings.db_path) as conn:
+        try:
+            report = sync_company(
+                conn,
+                args.ticker,
+                cvm_base_url=settings.cvm_base_url,
+                config=config.sync,
+                fetcher=HttpFetcher(settings.cache_dir / "cvm"),
+                sector_map=read_cvm_sector_map(),
+                sector_overrides=load_sector_overrides(),
+            )
+        except TickerNotFoundError as exc:
+            print(f"erro: {exc}")
+            return 1
+    print(f"empresa: {report.name} (CNPJ {report.cnpj})")
+    print(f"template contábil: {report.accounting_template} | setor: {report.sector or '—'}")
+    print(f"arquivos carregados: {', '.join(report.files_loaded) or 'nenhum'}")
+    print(f"arquivos sem mudança: {', '.join(report.files_unchanged) or 'nenhum'}")
+    print(f"documentos novos: {report.filings_added} | fatos novos: {report.facts_added}")
+    for warning in report.warnings:
+        print(f"aviso: {warning}")
+    return 0
+
+
+def _format_brl(value: Decimal) -> str:
+    text = f"{value:,.2f}"
+    return text.replace(",", "_").replace(".", ",").replace("_", ".")
+
+
+def _cmd_series(args: argparse.Namespace) -> int:
+    settings = get_settings()
+    with connect(settings.db_path, read_only=True) as conn:
+        rows = conn.execute(
+            """
+            SELECT f.period_type, f.period_start, f.period_end, f.value, f.unit,
+                   f.doc_type, f.reference_date, f.version
+            FROM v_concept_facts AS f
+            JOIN securities AS s ON s.cnpj = f.cnpj
+            WHERE s.ticker = ? AND f.concept = ? AND f.basis = ?
+              AND (? IS NULL OR f.period_type = ?)
+            ORDER BY f.period_end, f.period_type
+            """,
+            [args.ticker.upper(), args.concept, args.basis, args.period, args.period],
+        ).fetchall()
+    if not rows:
+        print(f"nenhum valor de {args.concept} para {args.ticker.upper()} — rode o sync antes")
+        return 1
+    print(f"{args.ticker.upper()} · {args.concept} · {args.basis}")
+    for period_type, start, end, value, unit, doc_type, ref, version in rows:
+        period = f"{start} a {end}" if start else f"em {end}"
+        print(
+            f"{period_type:7} {period:26} {_format_brl(value):>24} {unit:9} "
+            f"({doc_type} {ref} v{version})"
+        )
+    return 0
 
 
 def _cmd_init_db(_: argparse.Namespace) -> int:
@@ -84,6 +153,9 @@ def _cmd_doctor(_: argparse.Namespace) -> int:
         else:
             report("ok", f"banco em {settings.db_path}")
 
+    for name in EXTERNAL_URLS:
+        report("ok", f"{name.upper()} = {getattr(settings, name)}")
+
     return 1 if errors else 0
 
 
@@ -91,6 +163,8 @@ COMMANDS: dict[str, Callable[[argparse.Namespace], int]] = {
     "init-db": _cmd_init_db,
     "export-schemas": _cmd_export_schemas,
     "doctor": _cmd_doctor,
+    "sync": _cmd_sync,
+    "series": _cmd_series,
 }
 
 
@@ -104,7 +178,14 @@ def build_parser() -> argparse.ArgumentParser:
     sub.add_parser("init-db", help="cria o banco local e aplica as migrações pendentes")
     export = sub.add_parser("export-schemas", help="gera os JSON Schemas do contrato em schemas/")
     export.add_argument("--check", action="store_true", help="só verifica se estão em dia")
-    sub.add_parser("doctor", help="verifica .env, tokens, configuração, schemas e banco")
+    sub.add_parser("doctor", help="verifica .env, tokens, configuração, schemas, banco e URLs")
+    sync = sub.add_parser("sync", help="carrega no banco os dados da CVM de uma empresa")
+    sync.add_argument("ticker", help="código de negociação, ex.: BBAS3")
+    series = sub.add_parser("series", help="mostra a série histórica de um conceito no banco")
+    series.add_argument("ticker", help="código de negociação, ex.: BBAS3")
+    series.add_argument("concept", help="conceito do account_map, ex.: net_income")
+    series.add_argument("--period", choices=["INSTANT", "3M", "YTD", "FY"], default=None)
+    series.add_argument("--basis", choices=["consolidated", "individual"], default="consolidated")
     return parser
 
 

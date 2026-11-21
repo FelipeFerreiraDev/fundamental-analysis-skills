@@ -76,7 +76,8 @@ skillsInvest/
 
 - **Parâmetros de análise** (não secretos) ficam em `config/defaults.yaml`, versionado.
 - **Tokens e credenciais** ficam só no `.env`, que está fora do git. O `.env.example` (versionado) lista todas as variáveis sem valores. O engine lê as variáveis com pydantic-settings, e a falta de uma variável obrigatória gera um erro que diz qual variável configurar.
-- Variáveis atuais: `BRAPI_TOKEN`.
+- **URLs dos serviços externos** também ficam no `.env` (`CVM_BASE_URL`, `B3_COTAHIST_BASE_URL`, `BRAPI_BASE_URL`, `BCB_SGS_BASE_URL`), para deixar explícito de onde vêm os dados. O engine tem os mesmos valores como padrão, e um teste garante que eles coincidem com o `.env.example`. Só `https://` é aceito, e o `skillsinvest doctor` mostra as URLs em uso.
+- Variáveis atuais: `BRAPI_TOKEN`, `DATA_DIR` (opcional) e as quatro URLs.
 - **README.md** sempre reflete como instalar, configurar e executar o projeto. Toda mudança que afete isso atualiza o README no mesmo commit.
 
 ## 5. Catálogo de skills
@@ -265,7 +266,10 @@ Formato comum de resultado de valuation:
 
 - **Nunca sobrescrever fatos.** Reapresentação é uma nova linha com a nova versão do documento. O validador compara versões e sinaliza reapresentações.
 - **Normalização na entrada:** escala (`ESCALA_MOEDA`) → unidade; `DECIMAL` para valores monetários, nunca float; encoding dos CSVs da CVM corrigido.
-- **Template contábil** (`non_financial`, `bank`, `insurance`) determina o plano de contas usado. Ele é diferente do setor (§5). A tabela `account_map` liga cada código de conta da CVM (`CD_CONTA`), por template, a um conceito canônico do contrato (`net_income`, `equity`...).
+- **Template contábil** (`non_financial`, `bank`, `insurance`) determina o plano de contas usado. Ele é diferente do setor (§5) e é detectado no próprio DFP, pelo nome da primeira linha da DRE (conta 3.01: "Intermediação Financeira" → `bank`).
+- **Mapa de contas** ([engine/reference/account_map.csv](../engine/reference/account_map.csv)): liga cada código de conta da CVM (`CD_CONTA`), por template, a um conceito canônico do contrato (`net_income`, `equity`...). A vigência (`valid_from`/`valid_to`) vale para a **data de referência do documento**, não para o período do valor, porque o layout pertence ao documento. Motivo: a CVM mudou o plano de contas dos bancos em 2020, e o mesmo código passou a significar outra coisa (ex.: DRE 3.04.01 era "Receitas de Prestação de Serviços" e virou "Provisão para Perda Esperada"; DRE 3.09.01 era o lucro do controlador e o lucro passou para 3.11.01). O DFP 2020 reapresenta 2019 já no layout novo. A view `v_concept_facts` entrega um valor por conceito e período, sempre do documento mais recente.
+- **Conceitos que mudaram de significado não são mapeados no layout antigo.** Ex.: até 2019, o resultado bruto de intermediação dos bancos já descontava a provisão de crédito; a partir de 2020, não. Para não misturar coisas diferentes na mesma série, `gross_financial_intermediation_result` e `credit_loss_expense` só existem a partir do layout de 2020. `equity` (patrimônio do controlador) também só existe no layout novo; no antigo, ele é derivado como `equity_total − non_controlling_interests`.
+- **Setor:** vem do `SETOR_ATIV` do cadastro da CVM, via [engine/reference/cvm_sectors.yaml](../engine/reference/cvm_sectors.yaml) (o prefixo "Emp. Adm. Part. - " é ignorado). Exceções por ticker ficam em `config/sector_overrides.yaml`. Setor sem perfil gera aviso no `sync`.
 - **Bancos:** indicadores prudenciais (Basileia, CET1...) são do conglomerado prudencial (`basis = prudential`), não do consolidado IFRS.
 - **Dados extraídos de PDF** pelo modelo ficam em `document_facts`, separados dos dados estruturados, com URL, página, confiança e marca de revisão (`reviewed`).
 
@@ -273,7 +277,7 @@ Formato comum de resultado de valuation:
 
 | Tabela | Conteúdo |
 |---|---|
-| `ingestion_runs`, `source_files` | Manifest de cada carga |
+| `ingestion_runs`, `source_files`, `source_file_scopes` | Manifest de cada carga: URL, ETag, SHA-256 e para quais empresas cada arquivo foi carregado |
 | `companies` | CNPJ, código CVM, nome, template contábil, setor |
 | `securities` | Ticker, CNPJ, classe (ON/PN/UNIT), vigência |
 | `filings` | Documento (DFP/ITR), data-base, versão, data de entrega |
@@ -287,7 +291,18 @@ Formato comum de resultado de valuation:
 | `bank_prudential` | Indicadores do IF.data por conglomerado e data-base |
 | `document_facts` | Dados extraídos de PDF pelo modelo |
 
-Views: última versão de cada fato; trimestre isolado (incluindo 4T = DFP − 9M); últimos 12 meses (9M atual + ano anterior − 9M anterior); preços ajustados por proventos e eventos.
+Views existentes: `v_financial_facts_latest` (último valor conhecido de cada conta e período), `v_concept_facts` (o mesmo, já como conceito do contrato) e `v_ingestion_freshness`. Próximas: trimestre isolado (incluindo 4T = DFP − 9M), últimos 12 meses (9M atual + ano anterior − 9M anterior) e preços ajustados por proventos e eventos.
+
+### 7.5 Sync da CVM
+
+`skillsinvest sync <TICKER>`:
+
+1. Resolve o ticker para o CNPJ no FCA (valores mobiliários) do ano corrente ou do anterior.
+2. Lê o cadastro (nome, setor, controle acionário).
+3. Para cada DFP (`sync.history_years`) e ITR (`sync.quarterly_years`): consulta o ETag; se aquele arquivo já foi carregado para a empresa, pula; senão baixa, filtra as linhas do CNPJ e grava documentos, contas e quantidade de ações numa transação por arquivo.
+4. Documentos já existentes (mesmo CNPJ, tipo, data e versão) não são regravados. Uma nova versão entra como novo documento.
+
+Regras de normalização: escala `MIL` × 1000, exceto o lucro por ação (DRE 3.99.*), que a CVM já publica em R$/ação; moeda diferente de `REAL` é rejeitada; balanço é `INSTANT`, fluxos do DFP são `FY`, fluxos do ITR que começam em 1º de janeiro são `YTD` (o 1º trimestre fica como `YTD`) e os demais são `3M`.
 
 ### 7.4 Atualização
 
@@ -297,7 +312,7 @@ Sob demanda: antes de uma análise, o `sync` verifica quais fontes estão desatu
 
 | Fonte | Uso | Frequência |
 |---|---|---|
-| CVM Dados Abertos — DFP, ITR, cadastro | Demonstrações financeiras padronizadas | Semanal (ITR confirmado; DFP a confirmar) |
+| CVM Dados Abertos — DFP, ITR, FCA, cadastro | Demonstrações financeiras padronizadas, tickers e classes de ações | Semanal: os arquivos de DFP e ITR são regenerados juntos (ambos com Last-Modified de 15/11/2026). DFP desde 2010, ITR desde 2011 |
 | Site de RI da empresa (PDF) | Trimestre ainda não publicado na CVM, lucro recorrente, guidance, dados gerenciais, Pilar 3 dos bancos | No dia da divulgação |
 | B3 COTAHIST | Histórico oficial de cotações (sem ajuste) | Diário |
 | brapi.dev (plano grátis, `BRAPI_TOKEN` no `.env`) | Cotação do dia | Quase tempo real; 15.000 req/mês, 1 ticker por chamada |
@@ -340,9 +355,10 @@ Primeira empresa: **BBAS3**. Um banco testa logo o caso mais difícil do contrat
 ## 12. Pendências
 
 - [x] Criar token gratuito da brapi e colocar no `.env` como `BRAPI_TOKEN` (BBAS3 não está entre os tickers liberados sem token).
-- [ ] Mapear o `SETOR_ATIV` do cadastro da CVM para template contábil e perfil setorial (fase 1).
+- [x] Mapear o `SETOR_ATIV` do cadastro da CVM para perfil setorial (o template contábil é detectado no DFP).
+- [ ] Mapa de contas para `non_financial` e `insurance` (com a primeira empresa de cada tipo).
 - [ ] Fonte gratuita confiável de **histórico de proventos por ação** (data-com, JCP bruto/líquido, extraordinários) — necessária na fase 1 para o Bazin.
-- [ ] Confirmar a periodicidade de atualização do conjunto DFP na CVM.
+- [x] Confirmar a periodicidade de atualização do conjunto DFP na CVM (semanal, junto com o ITR).
 - [ ] Definir valores padrão de `config/defaults.yaml` além do DY de 6% (margem de segurança, janela do Bazin, Ke).
 - [ ] **README inicial (fase 0):** instalação, configuração do `.env`, `data/` (banco, cache e PDFs) fora do git e como reconstruir com `sync`. Depois disso, atualizado a cada mudança de execução.
 - [ ] Aviso no relatório de que a análise não constitui recomendação de investimento.

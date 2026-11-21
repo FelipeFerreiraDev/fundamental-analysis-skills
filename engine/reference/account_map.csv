@@ -1,0 +1,30 @@
+accounting_template,statement,account_code,concept,sign,valid_from,valid_to,notes
+bank,BPA,1,total_assets,1,,,Ativo Total
+bank,BPA,1.01,cash_and_equivalents,1,,,Caixa e Equivalentes de Caixa
+bank,BPP,2,total_liabilities_and_equity,1,,,Passivo Total
+bank,DFC_MI,6.01,operating_cash_flow,1,,,Caixa Líquido das Atividades Operacionais
+bank,DFC_MI,6.02,investing_cash_flow,1,,,Caixa Líquido das Atividades de Investimento
+bank,DFC_MI,6.03,financing_cash_flow,1,,,Caixa Líquido das Atividades de Financiamento
+bank,DRE,3.01,financial_intermediation_revenue,1,,,Receitas de Intermediação Financeira
+bank,DRE,3.05,income_before_taxes,1,,,Resultado antes dos Tributos sobre o Lucro
+bank,DRE,3.06,income_taxes,1,,,Imposto de Renda e Contribuição Social
+bank,BPP,2.08,equity_total,1,,2019-12-31,Layout até 2019: Patrimônio Líquido Consolidado
+bank,BPP,2.08.09,non_controlling_interests,1,,2019-12-31,Layout até 2019: Participação dos Acionistas Não Controladores
+bank,DRE,3.04.01,service_fee_revenue,1,,2019-12-31,Layout até 2019: Receitas de Prestação de Serviços
+bank,DRE,3.04.02,personnel_expenses,1,,2019-12-31,Layout até 2019: Despesas de Pessoal (negativo)
+bank,DRE,3.04.03,administrative_expenses,1,,2019-12-31,Layout até 2019: Outras Despesas Administrativas (negativo)
+bank,DRE,3.09,net_income_consolidated,1,,2019-12-31,Layout até 2019: Lucro/Prejuízo Consolidado do Período
+bank,DRE,3.09.01,net_income,1,,2019-12-31,Layout até 2019: Atribuído a Sócios da Empresa Controladora
+bank,BPA,1.02.04.04,credit_operations,1,2020-01-01,,Operações de Crédito (ao custo amortizado)
+bank,BPP,2.02.01,deposits,1,2020-01-01,,Depósitos
+bank,BPP,2.07,equity_total,1,2020-01-01,,Patrimônio Líquido Consolidado (inclui não controladores)
+bank,BPP,2.07.01,equity,1,2020-01-01,,Patrimônio Líquido Atribuído ao Controlador
+bank,BPP,2.07.02,non_controlling_interests,1,2020-01-01,,Patrimônio Líquido Atribuído aos Não Controladores
+bank,DRE,3.02,financial_intermediation_expenses,1,2020-01-01,,Despesas de Intermediação Financeira sem a provisão de crédito (negativo)
+bank,DRE,3.03,gross_financial_intermediation_result,1,2020-01-01,,Resultado Bruto de Intermediação Financeira antes da provisão de crédito
+bank,DRE,3.04.01,credit_loss_expense,1,2020-01-01,,Despesa de provisão para perdas de crédito (negativo)
+bank,DRE,3.04.02,service_fee_revenue,1,2020-01-01,,Receitas de Prestação de Serviços
+bank,DRE,3.04.03,personnel_expenses,1,2020-01-01,,Despesas com Pessoal (negativo)
+bank,DRE,3.04.04,administrative_expenses,1,2020-01-01,,Outras Despesas Administrativas (negativo)
+bank,DRE,3.11,net_income_consolidated,1,2020-01-01,,Lucro Líquido Consolidado (inclui não controladores)
+bank,DRE,3.11.01,net_income,1,2020-01-01,,Lucro Líquido Atribuído aos Sócios da Controladora

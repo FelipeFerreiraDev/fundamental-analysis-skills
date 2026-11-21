@@ -7,6 +7,7 @@ from pathlib import Path
 import duckdb
 
 from engine.db.migrate import Migration, migrate
+from engine.db.reference import load_reference_data
 from engine.settings import get_settings
 
 
@@ -18,6 +19,11 @@ def connect(db_path: Path | None = None, *, read_only: bool = False) -> duckdb.D
 
 
 def init_database(db_path: Path | None = None) -> list[Migration]:
-    """Create the database if needed and apply pending migrations. Returns what was applied."""
+    """Create the database if needed, apply pending migrations and reload reference data.
+
+    Returns the migrations that were applied.
+    """
     with connect(db_path) as conn:
-        return migrate(conn)
+        applied = migrate(conn)
+        load_reference_data(conn)
+        return applied
