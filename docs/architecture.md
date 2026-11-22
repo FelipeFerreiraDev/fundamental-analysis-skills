@@ -154,7 +154,7 @@ Uma única skill, `sector-analysis`, com um perfil por setor em `references/sect
 | Skill | Responsabilidade |
 |---|---|
 | `stock-analyst` | Identifica empresa e tipo, aciona os especialistas aplicáveis, consolida, aponta divergências entre métodos e emite o parecer. Não altera resultados dos especialistas |
-| `report-html` | Renderiza o relatório a partir dos JSONs via template. Não calcula, não escreve números, só verifica se todos os resultados esperados estão presentes |
+| `report-html` | Renderiza o relatório a partir dos JSONs via template Jinja2 (`engine/report/`), com gráficos SVG gerados no engine (funcionam offline e na impressão), tema claro e escuro. Não calcula, não escreve números, só verifica se os arquivos são do mesmo snapshot |
 
 **Valuation consolidado:** nunca média simples entre métodos. O relatório mostra a faixa dos métodos aplicáveis (mínimo, mediana, máximo). Qualquer ponderação precisa ser explícita e justificada.
 
@@ -373,8 +373,8 @@ Detalhes completos irão para o `references/` de cada skill.
 
 | Fase | Entregas |
 |---|---|
-| 0 | `CLAUDE.md`, este documento, README com instalação e execução, `.env.example`, schemas v0.1, esqueleto do `engine`, schema do banco, fixture BBAS3 |
-| 1 | Fatia ponta a ponta com BBAS3: `sync` (CVM, COTAHIST, SGS, brapi) → `data-extractor` → `data-validator` básico → `indicators` básico → `valuation-graham` + `valuation-bazin` → `report-html` simples |
+| 0 ✅ | `CLAUDE.md`, este documento, README com instalação e execução, `.env.example`, schemas v0.1, esqueleto do `engine`, schema do banco, fixture BBAS3 |
+| 1 ✅ | Fatia ponta a ponta com BBAS3: `sync` (CVM, COTAHIST, SGS, brapi) → `data-extractor` → `data-validator` básico → `indicators` básico → `valuation-graham` + `valuation-bazin` → `report-html` simples |
 | 2 | `valuation-lynch`, `valuation-dcf`, `valuation-multiples`, `valuation-ddm`, `valuation-residual-income`; primeira empresa não financeira (valida o contrato e o `account_map` para `non_financial`) |
 | 3 | `sector-analysis` com o perfil `banking` completo e comparação entre bancos (IF.data; pares ITUB4, BBDC4, SANB11) |
 | 4 | `quality-fisher`, `research-business`, `research-risk`, `stock-analyst` completo |

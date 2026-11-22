@@ -18,6 +18,7 @@ from engine.indicators.core import compute_indicators
 from engine.ingest.http import HttpFetcher, purge_expired_cache
 from engine.ingest.market_sync import sync_macro, sync_market
 from engine.ingest.sync import TickerNotFoundError, sync_company
+from engine.report.render import render_report
 from engine.settings import EXTERNAL_URL_FIELDS, PROJECT_ROOT, env_file_path, get_settings
 from engine.snapshot.build import SnapshotError, build_snapshot, write_snapshot
 from engine.snapshot.folder import AnalysisFolder, AnalysisStateError
@@ -191,6 +192,17 @@ def _cmd_valuate(args: argparse.Namespace) -> int:
     return 0
 
 
+def _cmd_report(args: argparse.Namespace) -> int:
+    try:
+        folder = AnalysisFolder.latest(args.ticker)
+        path = render_report(folder, args.ticker)
+    except AnalysisStateError as exc:
+        print(f"erro: {exc}")
+        return 1
+    print(f"relatório: {path.relative_to(PROJECT_ROOT)}")
+    return 0
+
+
 def _format_value(value: Decimal, unit: str) -> str:
     if unit == "ratio":
         return f"{value:.4f}"
@@ -317,6 +329,7 @@ COMMANDS: dict[str, Callable[[argparse.Namespace], int]] = {
     "validate": _cmd_validate,
     "indicators": _cmd_indicators,
     "valuate": _cmd_valuate,
+    "report": _cmd_report,
 }
 
 
@@ -358,6 +371,8 @@ def build_parser() -> argparse.ArgumentParser:
     )
     valuate.add_argument("ticker", help="código de negociação, ex.: BBAS3")
     valuate.add_argument("--method", choices=["graham", "bazin", "all"], default="all")
+    report = sub.add_parser("report", help="gera o relatório HTML da última análise (report.html)")
+    report.add_argument("ticker", help="código de negociação, ex.: BBAS3")
     return parser
 
 

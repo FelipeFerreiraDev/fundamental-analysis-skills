@@ -16,12 +16,13 @@ O skillsInvest é um conjunto de analistas especializados (skills do Claude Code
 🚧 Em desenvolvimento.
 
 - ✅ **Fase 0 — fundação:** contrato de dados, banco local, CLI e testes.
-- 🚧 **Fase 1 — primeira análise completa com BBAS3:**
+- ✅ **Fase 1 — primeira análise completa com BBAS3:**
   - ✅ sync dos dados da CVM (cadastro, FCA, DFP e ITR) e mapa de contas de bancos
   - ✅ sync de cotações e proventos (B3), cotação do dia (brapi) e Selic/IPCA (Banco Central)
   - ✅ snapshot da análise (`data.json`) e validação dos dados (`validation.json`)
   - ✅ indicadores, Graham e Bazin, e as primeiras skills
-  - ⏭️ relatório HTML
+  - ✅ relatório HTML
+- ⏭️ **Fase 2:** Lynch, fluxo de caixa descontado, múltiplos, DDM, residual income e a primeira empresa não financeira
 
 ## Skills
 
@@ -34,6 +35,7 @@ Ficam em [.claude/skills/](.claude/skills/) e são usadas pelo Claude Code dentr
 | `indicators` | Calcula e explica LPA, VPA, ROE, P/L, P/VP, proventos e dividend yield |
 | `valuation-graham` | Número de Graham com preço-teto por margem de segurança |
 | `valuation-bazin` | Preço-teto de Bazin com JCP bruto e líquido |
+| `report-html` | Gera o relatório HTML a partir dos JSONs da análise |
 
 As skills nunca fazem contas: chamam o engine e interpretam os JSONs gerados. O roadmap completo está em [docs/architecture.md](docs/architecture.md#10-roadmap).
 
@@ -122,6 +124,7 @@ Com o ambiente ativado (`source .venv/bin/activate`):
 | `skillsinvest validate <TICKER>` | Confere o último `data.json` e grava `validation.json`. Termina com código 1 se algum erro bloquear os valuations. `-v` mostra todos os detalhes |
 | `skillsinvest indicators <TICKER>` | Calcula os indicadores do último snapshot validado e grava `indicators.json` |
 | `skillsinvest valuate <TICKER>` | Roda Graham e Bazin e grava `valuations/<método>.json`. `--method graham\|bazin\|all` |
+| `skillsinvest report <TICKER>` | Gera `report.html` (autocontido, tema claro e escuro, pronto para imprimir em PDF) a partir dos JSONs da análise |
 | `skillsinvest series <TICKER> <conceito>` | Mostra a série histórica de um conceito, com o documento de origem de cada valor. Opções: `--period INSTANT\|3M\|YTD\|FY` e `--basis consolidated\|individual` |
 | `skillsinvest export-schemas` | Regenera os JSON Schemas em `schemas/` a partir de `engine/contract/` |
 | `skillsinvest export-schemas --check` | Só verifica se `schemas/` está em dia (termina com código 1 se não estiver) |
@@ -138,6 +141,7 @@ skillsinvest snapshot BBAS3                      # analyses/BBAS3/2026-09-30/dat
 skillsinvest validate BBAS3                      # analyses/BBAS3/2026-09-30/validation.json
 skillsinvest indicators BBAS3                    # analyses/BBAS3/2026-09-30/indicators.json
 skillsinvest valuate BBAS3                       # analyses/BBAS3/2026-09-30/valuations/*.json
+skillsinvest report BBAS3                        # analyses/BBAS3/2026-09-30/report.html
 ```
 
 Cada etapa recusa rodar se a anterior estiver faltando, for de outro snapshot ou se a validação tiver erros.
@@ -186,7 +190,7 @@ As regras completas de trabalho estão no [CLAUDE.md](CLAUDE.md).
 
 ```
 ├── CLAUDE.md               # princípios e regras de trabalho (lido pelo Claude Code)
-├── .claude/skills/         # skills (data-extractor, data-validator, indicators, valuation-*)
+├── .claude/skills/         # skills (data-extractor, data-validator, indicators, valuation-*, report-html)
 ├── docs/architecture.md    # arquitetura e decisões
 ├── config/                 # parâmetros de análise e overrides de setor
 ├── schemas/                # JSON Schemas do contrato (gerados)
@@ -200,6 +204,7 @@ As regras completas de trabalho estão no [CLAUDE.md](CLAUDE.md).
 │   ├── validation/         # checagens → validation.json
 │   ├── indicators/         # indicadores → indicators.json
 │   ├── valuation/          # Graham e Bazin → valuations/*.json
+│   ├── report/             # template e gráficos → report.html
 │   └── ...                 # validação, indicadores, valuation, setores, relatório (próximas etapas)
 ├── analyses/               # saídas das análises (versionadas): data.json, validation.json...
 ├── tests/                  # testes e fixtures (BBAS3)

@@ -1,0 +1,304 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{ ticker }} — análise fundamentalista ({{ data.reference_date | day }})</title>
+<style>
+:root {
+  color-scheme: light;
+  --surface: #fcfcfb;
+  --surface-2: #f3f2ee;
+  --text-primary: #0b0b0b;
+  --text-secondary: #52514e;
+  --text-muted: #6d6c67;
+  --border: rgba(11, 11, 11, 0.10);
+  --grid: #e1e0d9;
+  --baseline: #c3c2b7;
+  --series-1: #2a78d6;
+  --link: #1f5fb0;
+  --good: #0ca30c;
+  --good-text: #006300;
+  --warning: #fab219;
+  --critical: #d03b3b;
+  --info: #898781;
+}
+@media (prefers-color-scheme: dark) {
+  :root:where(:not([data-theme="light"])) {
+    color-scheme: dark;
+    --surface: #1a1a19;
+    --surface-2: #232321;
+    --text-primary: #f0efec;
+    --text-secondary: #c3c2b7;
+    --text-muted: #a3a29b;
+    --border: rgba(255, 255, 255, 0.10);
+    --grid: #2c2c2a;
+    --baseline: #383835;
+    --series-1: #3987e5;
+    --link: #7db0f0;
+    --good-text: #0ca30c;
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --surface: #1a1a19;
+  --surface-2: #232321;
+  --text-primary: #f0efec;
+  --text-secondary: #c3c2b7;
+  --text-muted: #a3a29b;
+  --border: rgba(255, 255, 255, 0.10);
+  --grid: #2c2c2a;
+  --baseline: #383835;
+  --series-1: #3987e5;
+  --link: #7db0f0;
+  --good-text: #0ca30c;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--surface);
+  color: var(--text-primary);
+  font: 15px/1.55 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  font-variant-numeric: tabular-nums;
+}
+main { max-width: 980px; margin: 0 auto; padding: 24px 16px 64px; }
+a { color: var(--link); }
+h1 { font-size: 28px; margin: 0 0 4px; }
+h2 { font-size: 20px; margin: 40px 0 12px; padding-top: 8px; border-top: 1px solid var(--border); }
+h3 { font-size: 16px; margin: 24px 0 8px; }
+p { margin: 8px 0; }
+.muted { color: var(--text-muted); }
+.secondary { color: var(--text-secondary); }
+.small { font-size: 13px; }
+header .meta { display: flex; flex-wrap: wrap; gap: 4px 20px; color: var(--text-secondary); }
+nav { display: flex; flex-wrap: wrap; gap: 6px 16px; margin: 16px 0 0; font-size: 14px; }
+.disclaimer { margin-top: 16px; padding: 10px 14px; border-radius: 8px; background: var(--surface-2); color: var(--text-secondary); font-size: 13px; }
+.table-wrap { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-size: 14px; }
+th, td { text-align: left; padding: 7px 10px; border-bottom: 1px solid var(--border); vertical-align: top; }
+th { color: var(--text-secondary); font-weight: 600; }
+td.num, th.num { text-align: right; white-space: nowrap; }
+.cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 12px; }
+.card { border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; }
+.card .label { color: var(--text-secondary); font-size: 13px; }
+.card .value { font-size: 22px; font-weight: 600; margin: 2px 0; }
+.card .period { color: var(--text-muted); font-size: 12px; }
+.status { display: inline-flex; align-items: center; gap: 6px; font-weight: 600; font-size: 13px; }
+.status::before { content: ""; width: 10px; height: 10px; border-radius: 50%; background: var(--dot); flex: none; }
+.status.critical { --dot: var(--critical); }
+.status.warning { --dot: var(--warning); }
+.status.info { --dot: var(--info); }
+.status.good { --dot: var(--good); }
+.issue { border: 1px solid var(--border); border-radius: 10px; padding: 10px 14px; margin: 10px 0; }
+.issue ul { margin: 6px 0 0; padding-left: 20px; font-size: 13px; color: var(--text-secondary); }
+details summary { cursor: pointer; color: var(--text-secondary); font-size: 13px; margin-top: 6px; }
+.yes { color: var(--good-text); font-weight: 600; }
+.no { color: var(--text-secondary); }
+.method { border: 1px solid var(--border); border-radius: 12px; padding: 4px 18px 14px; margin: 16px 0; }
+.formula { font-family: ui-monospace, "SFMono-Regular", Menlo, monospace; background: var(--surface-2); padding: 2px 8px; border-radius: 6px; }
+.chart-block { margin: 12px 0 24px; }
+.chart-title { font-weight: 600; margin-bottom: 4px; }
+svg.chart { width: 100%; height: auto; display: block; }
+svg.chart .grid { stroke: var(--grid); stroke-width: 1; }
+svg.chart .baseline { stroke: var(--baseline); stroke-width: 1; }
+svg.chart .tick { fill: var(--text-muted); font-size: 11px; }
+svg.chart .value { fill: var(--text-primary); font-size: 12px; font-weight: 600; }
+svg.chart .bar { fill: var(--series-1); }
+svg.chart .hit { fill: transparent; }
+svg.chart .mark:hover .bar, svg.chart .mark:focus .bar { opacity: 0.75; }
+svg.chart .mark:focus { outline: none; }
+svg.chart .mark:focus .hit { stroke: var(--text-secondary); stroke-width: 1; }
+code { font-size: 13px; }
+@media print {
+  nav, details summary { display: none; }
+  details { display: block; }
+  details > * { display: block; }
+  h2 { break-after: avoid; }
+  .method, .issue, .card, .chart-block { break-inside: avoid; }
+  a { color: inherit; text-decoration: none; }
+}
+@media (forced-colors: active) {
+  svg.chart .bar { fill: CanvasText; }
+  .status::before { forced-color-adjust: none; border: 1px solid CanvasText; }
+}
+</style>
+</head>
+<body>
+<main>
+<header>
+  <h1>{{ company.name }} <span class="secondary">({{ ticker }})</span></h1>
+  <div class="meta">
+    <span>Balanço de referência: <strong>{{ data.reference_date | day }}</strong></span>
+    {% if price %}<span>Preço: <strong>{{ price.value | brl }}</strong> em {{ price.period.end | day }}</span>{% endif %}
+    <span>Setor: {{ company.sector }} · template contábil {{ company.accounting_template }}</span>
+    <span>Dados extraídos em {{ data.as_of | day }}</span>
+  </div>
+  <nav>
+    <a href="#resumo">Resumo</a><a href="#avisos">Avisos</a><a href="#indicadores">Indicadores</a>
+    <a href="#historico">Histórico</a><a href="#metodos">Métodos</a><a href="#fontes">Fontes</a>
+  </nav>
+  <p class="disclaimer">Relatório gerado automaticamente a partir de dados públicos (CVM, B3, Banco Central, brapi). Tem caráter educacional e informativo e <strong>não constitui recomendação de investimento</strong>. Todo número vem dos arquivos da análise em <code>analyses/{{ ticker }}/{{ data.reference_date }}/</code>.</p>
+</header>
+
+<section id="resumo">
+  <h2>Resumo dos métodos</h2>
+  <div class="table-wrap">
+  <table>
+    <thead><tr><th>Método</th><th class="num">Valor justo</th><th class="num">Preço-teto</th><th class="num">Preço</th><th>Preço abaixo do teto?</th></tr></thead>
+    <tbody>
+    {% for row in methods %}
+      {% set out = row.result.result %}
+      <tr>
+        <td><a href="#{{ row.result.method }}">{{ row.label }}</a></td>
+        {% if row.result.applicable %}
+        <td class="num">{{ out.fair_value | brl if out.fair_value is not none else "—" }}</td>
+        <td class="num">
+          {% if out.ceiling_price is not none %}{{ out.ceiling_price | brl }}{% endif %}
+          {% for c in out.ceiling_prices %}{{ c.price | brl }} <span class="muted small">(margem {{ c.margin_of_safety | percent(0) }})</span><br>{% endfor %}
+        </td>
+        <td class="num">{{ out.price | brl }}</td>
+        <td>{% for label, ok in row.below_ceiling %}<span class="{{ 'yes' if ok else 'no' }}">{{ 'sim' if ok else 'não' }}</span> <span class="muted small">{{ label }}</span><br>{% endfor %}</td>
+        {% else %}
+        <td colspan="4" class="secondary">Não aplicável: {{ row.result.not_applicable_reason }}</td>
+        {% endif %}
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  </div>
+  <p class="small muted">Cada método é calculado de forma independente. A consolidação entre métodos e o parecer final ficam com o analista principal (<code>stock-analyst</code>), ainda não implementado; não há média entre métodos.</p>
+</section>
+
+<section id="avisos">
+  <h2>Avisos da validação dos dados</h2>
+  {% if validation.blocking %}<p><span class="status critical">Erro</span> A validação tem erros que bloqueiam os valuations.</p>{% endif %}
+  {% for check in issues %}
+    {% set label, css, _ = severity[check.severity] %}
+    <div class="issue">
+      <span class="status {{ css }}">{{ label }}</span> <strong>{{ check.id }}</strong> — {{ check.message }}
+      {% if check.details %}
+        {% if check.details | length > 4 %}
+        <details><summary>{{ check.details | length }} detalhes</summary><ul>{% for d in check.details %}<li>{{ d }}</li>{% endfor %}</ul></details>
+        {% else %}
+        <ul>{% for d in check.details %}<li>{{ d }}</li>{% endfor %}</ul>
+        {% endif %}
+      {% endif %}
+    </div>
+  {% endfor %}
+  {% if passed_checks %}
+  <p class="small"><span class="status good">Ok</span> {% for c in passed_checks %}{{ c.message }}{{ " " }}{% endfor %}</p>
+  {% endif %}
+</section>
+
+<section id="indicadores">
+  <h2>Indicadores</h2>
+  <div class="cards">
+  {% for label, value, kind in indicator_rows %}
+    <div class="card" title="{{ value.note or '' }}">
+      <div class="label">{{ label }}</div>
+      <div class="value">{{ value.value | by_unit(value.unit, kind=kind) }}</div>
+      <div class="period">
+        {% if value.period.start %}{{ value.period.start | day }} a {{ value.period.end | day }}{% else %}em {{ value.period.end | day }}{% endif %}
+      </div>
+    </div>
+  {% endfor %}
+  </div>
+  {% if indicators.unavailable %}
+  <p class="small secondary">Indisponíveis: {% for k, reason in indicators.unavailable.items() %}<code>{{ k }}</code> ({{ reason }}){{ "; " if not loop.last }}{% endfor %}.</p>
+  {% endif %}
+  <details><summary>Como cada indicador foi calculado</summary>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Indicador</th><th>Cálculo</th><th>Fontes</th></tr></thead>
+      <tbody>
+      {% for label, value, kind in indicator_rows %}
+        <tr><td>{{ label }}</td><td class="small">{{ value.note or "valor reportado" }}</td>
+        <td class="small">{% for sid in value.source_ids %}<a href="#src-{{ sid }}">{{ sid }}</a>{{ ", " if not loop.last }}{% endfor %}</td></tr>
+      {% endfor %}
+      </tbody>
+    </table></div>
+  </details>
+</section>
+
+<section id="historico">
+  <h2>Histórico</h2>
+  {% if net_income %}
+  <div class="chart-block">
+    <div class="chart-title">Lucro líquido do controlador por ano (R$ bilhões)</div>
+    {{ charts.net_income }}
+    <details><summary>Ver tabela</summary>
+      <div class="table-wrap"><table><thead><tr><th>Ano</th><th class="num">Lucro líquido</th></tr></thead><tbody>
+      {% for year, value in net_income %}<tr><td>{{ year }}</td><td class="num">{{ value | brl_compact }}</td></tr>{% endfor %}
+      </tbody></table></div>
+    </details>
+  </div>
+  {% endif %}
+  {% if dividends_gross %}
+  <div class="chart-block">
+    <div class="chart-title">Proventos por ação por ano, pela data-com (JCP bruto, ajustados por desdobramentos)</div>
+    {{ charts.dividends }}
+    <details><summary>Ver tabela (bruto e líquido)</summary>
+      <div class="table-wrap"><table><thead><tr><th>Ano</th><th class="num">JCP bruto</th><th class="num">JCP líquido</th></tr></thead><tbody>
+      {% for year, value in dividends_gross %}<tr><td>{{ year }}</td><td class="num">{{ value | brl }}</td><td class="num">{{ net_by_year.get(year) | brl }}</td></tr>{% endfor %}
+      </tbody></table></div>
+    </details>
+  </div>
+  {% endif %}
+</section>
+
+<section id="metodos">
+  <h2>Métodos de valuation</h2>
+  {% for row in methods %}
+  {% set r = row.result %}
+  <div class="method" id="{{ r.method }}">
+    <h3>{{ row.label }}</h3>
+    {% if not r.applicable %}
+      <p><span class="status info">Não aplicável</span> {{ r.not_applicable_reason }}</p>
+      <p class="small secondary">{{ r.applicability_rationale }}</p>
+    {% else %}
+      <p>Fórmula: <span class="formula">{{ r.formula }}</span></p>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Entrada</th><th class="num">Valor</th><th>Período</th><th>Origem</th></tr></thead>
+        <tbody>
+        {% for name, value in r.inputs.items() %}
+          <tr><td><code>{{ name }}</code>{% if value.note %}<div class="small muted">{{ value.note }}</div>{% endif %}</td>
+          <td class="num">{{ value.value | by_unit(value.unit) }}</td>
+          <td class="small">{% if value.period.start %}{{ value.period.start | day }} a {{ value.period.end | day }}{% else %}em {{ value.period.end | day }}{% endif %}</td>
+          <td class="small">{{ value.nature }} · {% for sid in value.source_ids %}<a href="#src-{{ sid }}">{{ sid }}</a>{{ ", " if not loop.last }}{% endfor %}</td></tr>
+        {% endfor %}
+        </tbody>
+      </table></div>
+      <h3>Resultado</h3>
+      <div class="table-wrap"><table><tbody>
+        {% if r.result.fair_value is not none %}<tr><td>Valor justo</td><td class="num"><strong>{{ r.result.fair_value | brl }}</strong></td></tr>{% endif %}
+        {% if r.result.ceiling_price is not none %}<tr><td>Preço-teto</td><td class="num"><strong>{{ r.result.ceiling_price | brl }}</strong></td></tr>{% endif %}
+        {% for c in r.result.ceiling_prices %}<tr><td>Preço-teto com margem de segurança de {{ c.margin_of_safety | percent(0) }}</td><td class="num">{{ c.price | brl }}</td></tr>{% endfor %}
+        <tr><td>Preço comparado</td><td class="num">{{ r.result.price | brl }}</td></tr>
+        {% if r.result.margin_of_safety_at_price is not none %}<tr><td>Desconto do preço ao valor justo</td><td class="num">{{ r.result.margin_of_safety_at_price | percent }}</td></tr>{% endif %}
+      </tbody></table></div>
+      <h3>Premissas</h3>
+      <ul class="small">{% for a in r.assumptions %}<li><code>{{ a.name }}</code> = {{ a.value }} — {{ a.justification }}</li>{% endfor %}</ul>
+      <h3>Limitações</h3>
+      <ul class="small">{% for l in r.limitations %}<li>{{ l }}</li>{% endfor %}</ul>
+      <p class="small muted">Aplicabilidade: {{ r.applicability_rationale }}</p>
+    {% endif %}
+  </div>
+  {% endfor %}
+</section>
+
+<section id="fontes">
+  <h2>Fontes</h2>
+  <div class="table-wrap"><table>
+    <thead><tr><th>Id</th><th>Fonte</th><th>Publicado</th><th>Obtido em</th></tr></thead>
+    <tbody>
+    {% for sid, s in sources.items() %}
+      <tr id="src-{{ sid }}"><td class="small"><code>{{ sid }}</code></td>
+      <td class="small">{{ s.provider | upper }} · {{ s.document_type }}{% if s.title %} — {{ s.title }}{% endif %}{% if s.url %}<br><a href="{{ s.url }}">{{ s.url | truncate(90, true) }}</a>{% endif %}</td>
+      <td class="small">{{ s.published_at | day }}</td><td class="small">{{ s.retrieved_at | day }}</td></tr>
+    {% endfor %}
+    </tbody>
+  </table></div>
+  <p class="small muted">Engine {{ engine_version }} · contrato {{ schema_version }} · relatório gerado em {{ generated_at | day }} · validação de {{ validation.generated_at | day }}.</p>
+</section>
+</main>
+</body>
+</html>
